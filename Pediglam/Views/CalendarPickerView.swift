@@ -118,7 +118,7 @@ struct CalendarPickerView: View {
                     .foregroundColor(.primaryText)
                 
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.iosBlue)
                 
                 Spacer()
@@ -173,8 +173,8 @@ struct CalendarPickerView: View {
                             .foregroundColor(.primaryText)
                         
                         Image(systemName: "chevron.up")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.iosBlue.opacity(0.5))
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.iosBlue)
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
