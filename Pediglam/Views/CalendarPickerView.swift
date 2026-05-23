@@ -4,10 +4,10 @@ import EventKit
 struct CalendarPickerView: View {
     @ObservedObject var viewModel: CalendarViewModel
     @State private var selectedEventDetail: CalendarEvent? = nil
+    @State private var showCreateVisit = false
     
     @State private var rotationDegree: Double = 0.0
     @State private var displayedMonth = Date()
-    @State private var slideDirection: CGFloat = 0
     
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 7)
     private let calendar = Calendar.current
@@ -21,6 +21,13 @@ struct CalendarPickerView: View {
                     .foregroundColor(.primaryText)
                 
                 Spacer()
+                
+                Button(action: { showCreateVisit = true }) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.iosBlue)
+                        .padding(.trailing, 6)
+                }
                 
                 Button(action: {
                     withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: false)) {
@@ -60,6 +67,9 @@ struct CalendarPickerView: View {
         .background(Color.systemBackground)
         .sheet(item: $selectedEventDetail) { event in
             EventDetailSheet(event: event)
+        }
+        .sheet(isPresented: $showCreateVisit) {
+            CreateVisitSheet(viewModel: viewModel)
         }
         .onAppear {
             displayedMonth = viewModel.selectedDate

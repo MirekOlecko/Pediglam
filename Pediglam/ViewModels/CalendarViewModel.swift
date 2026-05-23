@@ -230,6 +230,42 @@ class CalendarViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Write Operations
+    
+    func createVisit(clientName: String, date: Date, hour: Int, minute: Int, durationMinutes: Int, serviceNote: String?) {
+        let calendar = Calendar.current
+        
+        guard let startDate = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: date),
+              let endDate = calendar.date(byAdding: .minute, value: durationMinutes, to: startDate) else {
+            return
+        }
+        
+        // Format title: "ClientName HH:MM serviceNote"
+        let timeStr = String(format: "%d:%02d", hour, minute)
+        var title = "\(clientName) \(timeStr)"
+        if let note = serviceNote, !note.trimmingCharacters(in: .whitespaces).isEmpty {
+            title += " \(note)"
+        }
+        
+        do {
+            _ = try calendarService.createEvent(title: title, startDate: startDate, endDate: endDate)
+            loadEvents()
+            loadDashboardEvents()
+        } catch {
+            self.error = "Failed to create visit: \(error.localizedDescription)"
+        }
+    }
+    
+    func deleteVisit(_ event: CalendarEvent) {
+        do {
+            try calendarService.deleteEvent(event.ekEvent)
+            loadEvents()
+            loadDashboardEvents()
+        } catch {
+            self.error = "Failed to delete visit: \(error.localizedDescription)"
+        }
+    }
+    
     func loadEvents() {
         self.authorizationStatus = calendarService.checkAuthorizationStatus()
         guard authorizationStatus == .authorized else {

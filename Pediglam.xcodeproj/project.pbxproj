@@ -26,12 +26,14 @@
 		A19184AFF6AB7891B5242FE8 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0EF95639892244A80B68EFB /* SummaryView.swift */; };
 		B026E7BA490A8217D1220416 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F878D783AF05D20413EA8 /* EmptyStateView.swift */; };
 		B3F7FBF3AD34DC79C19BE8B7 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB147D13E35F3EB1C695D6AC /* AppColors.swift */; };
+		D624938652BD53A20EBB9FBD /* CreateVisitSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1912CE549CAD9AE8E2F345 /* CreateVisitSheet.swift */; };
 		E34D9F0CAECB9E762F4AF097 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F5A4F1D5A442BEA2CB3F546 /* CalendarEvent.swift */; };
 		EAB47B7FEF00B7D9508A037D /* EventDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CADCF1CBFB1BA2140470A543 /* EventDetailSheet.swift */; };
 		F3363EE617332404DE509DD4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18DA06F34A55430CA9CB89C9 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E1912CE549CAD9AE8E2F345 /* CreateVisitSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVisitSheet.swift; sourceTree = "<group>"; };
 		18DA06F34A55430CA9CB89C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		317F878D783AF05D20413EA8 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		34C5ED4763038A801BEC3F47 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -48,7 +50,7 @@
 		987F8CF3C950702BF39AC787 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		B0E8E3B6116356CC7D5DD3AB /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		BC77BC1F2331E5144A1E0AF4 /* SettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSheet.swift; sourceTree = "<group>"; };
-		BD5D3C9544A7B37ECA1CE586 /* Pediglam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pediglam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD5D3C9544A7B37ECA1CE586 /* Pediglam.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Pediglam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDC116E2127B8EB5789AF191 /* TimeSlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSlot.swift; sourceTree = "<group>"; };
 		C03ED1336D58FCF353667092 /* DaySchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaySchedule.swift; sourceTree = "<group>"; };
 		CADCF1CBFB1BA2140470A543 /* EventDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailSheet.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 		DBAD5F8FBAB9309A4E7B5732 /* sheets */ = {
 			isa = PBXGroup;
 			children = (
+				0E1912CE549CAD9AE8E2F345 /* CreateVisitSheet.swift */,
 				CADCF1CBFB1BA2140470A543 /* EventDetailSheet.swift */,
 				BC77BC1F2331E5144A1E0AF4 /* SettingsSheet.swift */,
 			);
@@ -206,6 +209,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 55A4818F9F1D8AF6D5D8E654 /* Build configuration list for PBXProject "Pediglam" */;
 			developmentRegion = en;
@@ -249,6 +254,7 @@
 				77460CADD8891A4274139D10 /* CalendarService.swift in Sources */,
 				4914E795EE3D078D848950F6 /* CalendarViewModel.swift in Sources */,
 				0B97C705FB272A66D2030C19 /* ContentView.swift in Sources */,
+				D624938652BD53A20EBB9FBD /* CreateVisitSheet.swift in Sources */,
 				10B08D9B4109C1A8A28442FD /* DashboardView.swift in Sources */,
 				3C9A7F0C3E5F9036D6F0A54D /* DateExtensions.swift in Sources */,
 				3369A4E55E76443D8658F921 /* DaySchedule.swift in Sources */,
@@ -276,7 +282,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Pediglam/Resources/Assets.xcassets\"";
-				DEVELOPMENT_TEAM = SY7AZD8JTH;
 				INFOPLIST_FILE = Pediglam/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -352,7 +357,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Pediglam/Resources/Assets.xcassets\"";
-				DEVELOPMENT_TEAM = SY7AZD8JTH;
 				INFOPLIST_FILE = Pediglam/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (

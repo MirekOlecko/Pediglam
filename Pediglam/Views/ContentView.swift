@@ -5,6 +5,7 @@ struct ContentView: View {
     @ObservedObject var viewModel: CalendarViewModel
     @Binding var showSettings: Bool
     @State private var selectedEventDetail: CalendarEvent? = nil
+    @State private var showCreateVisit = false
     
     var body: some View {
         ZStack {
@@ -30,6 +31,13 @@ struct ContentView: View {
                     }
                     
                     Spacer()
+                    
+                    // Add visit button
+                    Button(action: { showCreateVisit = true }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.iosBlue)
+                    }
                     
                     DatePicker(
                         "",
@@ -93,6 +101,9 @@ struct ContentView: View {
         }
         .sheet(item: $selectedEventDetail) { event in
             EventDetailSheet(event: event)
+        }
+        .sheet(isPresented: $showCreateVisit) {
+            CreateVisitSheet(viewModel: viewModel)
         }
         .onAppear {
             viewModel.loadEvents()

@@ -46,4 +46,21 @@ class CalendarService {
         let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
         return eventStore.events(matching: predicate)
     }
+    
+    // MARK: - Write Operations
+    
+    func createEvent(title: String, startDate: Date, endDate: Date, notes: String? = nil) throws -> EKEvent {
+        let event = EKEvent(eventStore: eventStore)
+        event.title = title
+        event.startDate = startDate
+        event.endDate = endDate
+        event.notes = notes
+        event.calendar = eventStore.defaultCalendarForNewEvents
+        try eventStore.save(event, span: .thisEvent)
+        return event
+    }
+    
+    func deleteEvent(_ event: EKEvent) throws {
+        try eventStore.remove(event, span: .thisEvent)
+    }
 }
