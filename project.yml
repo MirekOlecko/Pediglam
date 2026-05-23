@@ -1,0 +1,16 @@
+name: Pediglam
+options:
+  bundleIdPrefix: com.pediglam
+targets:
+  Pediglam:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: Pediglam
+    settings:
+      INFOPLIST_FILE: Pediglam/Info.plist
+      PRODUCT_BUNDLE_IDENTIFIER: com.pediglam.Pediglam
+      MARKETING_VERSION: 1.0.0
+      CURRENT_PROJECT_VERSION: 1
+      DEVELOPMENT_ASSET_PATHS: '"Pediglam/Resources/Assets.xcassets"'

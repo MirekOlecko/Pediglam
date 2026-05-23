@@ -1,0 +1,455 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		049518EA342A03AC40D14313 /* SettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC77BC1F2331E5144A1E0AF4 /* SettingsSheet.swift */; };
+		0B97C705FB272A66D2030C19 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D0E2B3A7E1B7B3C8CCFC87 /* ContentView.swift */; };
+		10AB76F6F3F093E61570EAF4 /* CalendarPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9E330F0FEE726F046D5D07 /* CalendarPickerView.swift */; };
+		10B08D9B4109C1A8A28442FD /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75194DDCA174E708F9FED8A0 /* DashboardView.swift */; };
+		1C86FEA2925F1C6C6C090247 /* FreeSlotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AFEFD28969284B48B8FECEF /* FreeSlotCard.swift */; };
+		3369A4E55E76443D8658F921 /* DaySchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03ED1336D58FCF353667092 /* DaySchedule.swift */; };
+		37068D620CDD3EE14D203125 /* BusySlotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8049100FB1D596D496A6CD4F /* BusySlotCard.swift */; };
+		3C9A7F0C3E5F9036D6F0A54D /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD479B8B07550B6B7F3AC3C /* DateExtensions.swift */; };
+		43ADA3F14B75241811D60588 /* TimeSlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDC116E2127B8EB5789AF191 /* TimeSlot.swift */; };
+		4914E795EE3D078D848950F6 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458DEC64174DC3F6805E78FE /* CalendarViewModel.swift */; };
+		67D1EB3D1356C624A149C03E /* PediglamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC4FA74A96EE3C1C3238259 /* PediglamApp.swift */; };
+		6A62389C17F82F9A1577719D /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E8E3B6116356CC7D5DD3AB /* HeaderView.swift */; };
+		724197FFA506CDE9070A27DF /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB97D5E4D9310123452D217 /* SplashScreen.swift */; };
+		72B741F9C12B1866E1535B73 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987F8CF3C950702BF39AC787 /* MainTabView.swift */; };
+		77460CADD8891A4274139D10 /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE888D65B6304F3DE447870 /* CalendarService.swift */; };
+		90345CB612ACFADD77577324 /* EventCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863FBFFC8580C7AE1C75330C /* EventCard.swift */; };
+		A19184AFF6AB7891B5242FE8 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0EF95639892244A80B68EFB /* SummaryView.swift */; };
+		B026E7BA490A8217D1220416 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F878D783AF05D20413EA8 /* EmptyStateView.swift */; };
+		B3F7FBF3AD34DC79C19BE8B7 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB147D13E35F3EB1C695D6AC /* AppColors.swift */; };
+		E34D9F0CAECB9E762F4AF097 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F5A4F1D5A442BEA2CB3F546 /* CalendarEvent.swift */; };
+		EAB47B7FEF00B7D9508A037D /* EventDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CADCF1CBFB1BA2140470A543 /* EventDetailSheet.swift */; };
+		F3363EE617332404DE509DD4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18DA06F34A55430CA9CB89C9 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		18DA06F34A55430CA9CB89C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		317F878D783AF05D20413EA8 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		34C5ED4763038A801BEC3F47 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3CB97D5E4D9310123452D217 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
+		3DC4FA74A96EE3C1C3238259 /* PediglamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PediglamApp.swift; sourceTree = "<group>"; };
+		3F5A4F1D5A442BEA2CB3F546 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
+		458DEC64174DC3F6805E78FE /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
+		58D0E2B3A7E1B7B3C8CCFC87 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		5FE888D65B6304F3DE447870 /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
+		6AFEFD28969284B48B8FECEF /* FreeSlotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeSlotCard.swift; sourceTree = "<group>"; };
+		75194DDCA174E708F9FED8A0 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		8049100FB1D596D496A6CD4F /* BusySlotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusySlotCard.swift; sourceTree = "<group>"; };
+		863FBFFC8580C7AE1C75330C /* EventCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCard.swift; sourceTree = "<group>"; };
+		987F8CF3C950702BF39AC787 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		B0E8E3B6116356CC7D5DD3AB /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
+		BC77BC1F2331E5144A1E0AF4 /* SettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSheet.swift; sourceTree = "<group>"; };
+		BD5D3C9544A7B37ECA1CE586 /* Pediglam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pediglam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDC116E2127B8EB5789AF191 /* TimeSlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSlot.swift; sourceTree = "<group>"; };
+		C03ED1336D58FCF353667092 /* DaySchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaySchedule.swift; sourceTree = "<group>"; };
+		CADCF1CBFB1BA2140470A543 /* EventDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailSheet.swift; sourceTree = "<group>"; };
+		CDD479B8B07550B6B7F3AC3C /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
+		DF9E330F0FEE726F046D5D07 /* CalendarPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarPickerView.swift; sourceTree = "<group>"; };
+		F0EF95639892244A80B68EFB /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
+		FB147D13E35F3EB1C695D6AC /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		09E0A11D6D39DE1777C51531 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				DF9E330F0FEE726F046D5D07 /* CalendarPickerView.swift */,
+				58D0E2B3A7E1B7B3C8CCFC87 /* ContentView.swift */,
+				75194DDCA174E708F9FED8A0 /* DashboardView.swift */,
+				987F8CF3C950702BF39AC787 /* MainTabView.swift */,
+				2D19D087CE6DA8B1B83ADDBC /* components */,
+				DBAD5F8FBAB9309A4E7B5732 /* sheets */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		0A83EE03DC762EF3037802B2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BD5D3C9544A7B37ECA1CE586 /* Pediglam.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1A7963CA8A225ED5F48ACA86 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				5FE888D65B6304F3DE447870 /* CalendarService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		2D19D087CE6DA8B1B83ADDBC /* components */ = {
+			isa = PBXGroup;
+			children = (
+				8049100FB1D596D496A6CD4F /* BusySlotCard.swift */,
+				317F878D783AF05D20413EA8 /* EmptyStateView.swift */,
+				863FBFFC8580C7AE1C75330C /* EventCard.swift */,
+				6AFEFD28969284B48B8FECEF /* FreeSlotCard.swift */,
+				B0E8E3B6116356CC7D5DD3AB /* HeaderView.swift */,
+				3CB97D5E4D9310123452D217 /* SplashScreen.swift */,
+				F0EF95639892244A80B68EFB /* SummaryView.swift */,
+			);
+			path = components;
+			sourceTree = "<group>";
+		};
+		48D1B600FA79594D4DDED447 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3F5A4F1D5A442BEA2CB3F546 /* CalendarEvent.swift */,
+				C03ED1336D58FCF353667092 /* DaySchedule.swift */,
+				BDC116E2127B8EB5789AF191 /* TimeSlot.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		64BCFF42134E38644EC77FAA /* App */ = {
+			isa = PBXGroup;
+			children = (
+				3DC4FA74A96EE3C1C3238259 /* PediglamApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		65CDB0A422371DDA95203AE8 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				18DA06F34A55430CA9CB89C9 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		71D635D23D7F19897C16A326 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				458DEC64174DC3F6805E78FE /* CalendarViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		764B32B50AAA93F7AB647FEA = {
+			isa = PBXGroup;
+			children = (
+				BCB53B6E4E51F6A080E7D50D /* Pediglam */,
+				0A83EE03DC762EF3037802B2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B4FE5495AB915E4FE38AA5B7 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				FB147D13E35F3EB1C695D6AC /* AppColors.swift */,
+				CDD479B8B07550B6B7F3AC3C /* DateExtensions.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		BCB53B6E4E51F6A080E7D50D /* Pediglam */ = {
+			isa = PBXGroup;
+			children = (
+				34C5ED4763038A801BEC3F47 /* Info.plist */,
+				64BCFF42134E38644EC77FAA /* App */,
+				48D1B600FA79594D4DDED447 /* Models */,
+				65CDB0A422371DDA95203AE8 /* Resources */,
+				1A7963CA8A225ED5F48ACA86 /* Services */,
+				B4FE5495AB915E4FE38AA5B7 /* Utilities */,
+				71D635D23D7F19897C16A326 /* ViewModels */,
+				09E0A11D6D39DE1777C51531 /* Views */,
+			);
+			path = Pediglam;
+			sourceTree = "<group>";
+		};
+		DBAD5F8FBAB9309A4E7B5732 /* sheets */ = {
+			isa = PBXGroup;
+			children = (
+				CADCF1CBFB1BA2140470A543 /* EventDetailSheet.swift */,
+				BC77BC1F2331E5144A1E0AF4 /* SettingsSheet.swift */,
+			);
+			path = sheets;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E068442D2523694B9E048AAE /* Pediglam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2AAEE99032ACC9C49BAADB71 /* Build configuration list for PBXNativeTarget "Pediglam" */;
+			buildPhases = (
+				F41F6DF198B882E073C51426 /* Sources */,
+				1EDE8EE608248741DDDB833A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Pediglam;
+			packageProductDependencies = (
+			);
+			productName = Pediglam;
+			productReference = BD5D3C9544A7B37ECA1CE586 /* Pediglam.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CACEC2208DB8962C4F5D6DE4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 55A4818F9F1D8AF6D5D8E654 /* Build configuration list for PBXProject "Pediglam" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 764B32B50AAA93F7AB647FEA;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0A83EE03DC762EF3037802B2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E068442D2523694B9E048AAE /* Pediglam */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1EDE8EE608248741DDDB833A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F3363EE617332404DE509DD4 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F41F6DF198B882E073C51426 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B3F7FBF3AD34DC79C19BE8B7 /* AppColors.swift in Sources */,
+				37068D620CDD3EE14D203125 /* BusySlotCard.swift in Sources */,
+				E34D9F0CAECB9E762F4AF097 /* CalendarEvent.swift in Sources */,
+				10AB76F6F3F093E61570EAF4 /* CalendarPickerView.swift in Sources */,
+				77460CADD8891A4274139D10 /* CalendarService.swift in Sources */,
+				4914E795EE3D078D848950F6 /* CalendarViewModel.swift in Sources */,
+				0B97C705FB272A66D2030C19 /* ContentView.swift in Sources */,
+				10B08D9B4109C1A8A28442FD /* DashboardView.swift in Sources */,
+				3C9A7F0C3E5F9036D6F0A54D /* DateExtensions.swift in Sources */,
+				3369A4E55E76443D8658F921 /* DaySchedule.swift in Sources */,
+				B026E7BA490A8217D1220416 /* EmptyStateView.swift in Sources */,
+				90345CB612ACFADD77577324 /* EventCard.swift in Sources */,
+				EAB47B7FEF00B7D9508A037D /* EventDetailSheet.swift in Sources */,
+				1C86FEA2925F1C6C6C090247 /* FreeSlotCard.swift in Sources */,
+				6A62389C17F82F9A1577719D /* HeaderView.swift in Sources */,
+				72B741F9C12B1866E1535B73 /* MainTabView.swift in Sources */,
+				67D1EB3D1356C624A149C03E /* PediglamApp.swift in Sources */,
+				049518EA342A03AC40D14313 /* SettingsSheet.swift in Sources */,
+				724197FFA506CDE9070A27DF /* SplashScreen.swift in Sources */,
+				A19184AFF6AB7891B5242FE8 /* SummaryView.swift in Sources */,
+				43ADA3F14B75241811D60588 /* TimeSlot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2A498B5C0227310409CBC122 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Pediglam/Resources/Assets.xcassets\"";
+				DEVELOPMENT_TEAM = SY7AZD8JTH;
+				INFOPLIST_FILE = Pediglam/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pediglam.Pediglam;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4B684035CDAF74439F59BFA8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		9CDDBC291FF0BC594BC395BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Pediglam/Resources/Assets.xcassets\"";
+				DEVELOPMENT_TEAM = SY7AZD8JTH;
+				INFOPLIST_FILE = Pediglam/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pediglam.Pediglam;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A2DA8A03BF580A217D75604A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2AAEE99032ACC9C49BAADB71 /* Build configuration list for PBXNativeTarget "Pediglam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CDDBC291FF0BC594BC395BC /* Debug */,
+				2A498B5C0227310409CBC122 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		55A4818F9F1D8AF6D5D8E654 /* Build configuration list for PBXProject "Pediglam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2DA8A03BF580A217D75604A /* Debug */,
+				4B684035CDAF74439F59BFA8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CACEC2208DB8962C4F5D6DE4 /* Project object */;
+}
