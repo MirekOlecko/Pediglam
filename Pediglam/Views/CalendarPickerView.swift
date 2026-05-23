@@ -74,6 +74,7 @@ struct CalendarPickerView: View {
         }
         .onAppear {
             displayedMonth = viewModel.selectedDate
+            viewModel.loadEvents()
         }
         .onChange(of: viewModel.selectedDate) { newDate in
             if !calendar.isDate(newDate, inSameDayAs: displayedMonth) {
