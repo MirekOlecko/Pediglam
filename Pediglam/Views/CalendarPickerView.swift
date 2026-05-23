@@ -5,6 +5,7 @@ struct CalendarPickerView: View {
     @ObservedObject var viewModel: CalendarViewModel
     @State private var selectedEventDetail: CalendarEvent? = nil
     @State private var showCreateVisit = false
+    @State private var calendarExpanded = true
     
     @State private var rotationDegree: Double = 0.0
     @State private var displayedMonth = Date()
@@ -55,7 +56,7 @@ struct CalendarPickerView: View {
             .padding(.top, 10)
             .padding(.bottom, 12)
             
-            // Calendar card
+            // Calendar card — collapsible
             calendarCard
             
             Divider()
@@ -83,10 +84,78 @@ struct CalendarPickerView: View {
         }
     }
     
-    // MARK: - Calendar Card
+    // MARK: - Calendar Card (collapsible)
     private var calendarCard: some View {
         VStack(spacing: 0) {
-            // Month navigation — compact pills
+            if calendarExpanded {
+                // Full calendar
+                fullCalendar
+            } else {
+                // Compact header
+                compactHeader
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.cardBackground)
+                .shadow(color: .black.opacity(0.03), radius: 8, x: 0, y: 2)
+        )
+        .padding(.horizontal)
+        .padding(.top, 4)
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: calendarExpanded)
+    }
+    
+    // MARK: - Compact Header
+    private var compactHeader: some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                calendarExpanded = true
+            }
+        }) {
+            HStack(spacing: 8) {
+                Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(.primaryText)
+                
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.iosBlue)
+                
+                Spacer()
+                
+                // Today button
+                Button(action: {
+                    viewModel.selectedDate = Date()
+                    displayedMonth = Date()
+                }) {
+                    Text("Today")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundColor(calendar.isDate(Date(), inSameDayAs: viewModel.selectedDate) ? .white : .iosBlue)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(
+                            calendar.isDate(Date(), inSameDayAs: viewModel.selectedDate)
+                                ? Color.iosBlue
+                                : Color.iosBlue.opacity(0.1)
+                        )
+                        .cornerRadius(10)
+                }
+                
+                Text(viewModel.selectedDate.formattedPolishHeader())
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.secondaryText)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    // MARK: - Full Calendar
+    private var fullCalendar: some View {
+        VStack(spacing: 0) {
+            // Month navigation
             HStack(spacing: 0) {
                 Button(action: { shiftMonth(-1) }) {
                     Image(systemName: "chevron.left")
@@ -97,14 +166,18 @@ struct CalendarPickerView: View {
                 
                 Spacer()
                 
-                Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(.primaryText)
-                    .id("month-\(displayedMonth.timeIntervalSince1970)")
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
+                Button(action: { withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { calendarExpanded = false } }) {
+                    HStack(spacing: 4) {
+                        Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundColor(.primaryText)
+                        
+                        Image(systemName: "chevron.up")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.iosBlue.opacity(0.5))
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
                 
                 Spacer()
                 
@@ -119,7 +192,7 @@ struct CalendarPickerView: View {
             .padding(.top, 14)
             .padding(.bottom, 12)
             
-            // Today quick-jump
+            // Today + selected date
             HStack {
                 Button(action: {
                     withAnimation(.easeInOut(duration: 0.3)) {
@@ -192,13 +265,6 @@ struct CalendarPickerView: View {
             .padding(.horizontal, 14)
             .padding(.bottom, 16)
         }
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.cardBackground)
-                .shadow(color: .black.opacity(0.03), radius: 8, x: 0, y: 2)
-        )
-        .padding(.horizontal)
-        .padding(.top, 4)
     }
     
     // MARK: - Content Below Calendar
@@ -313,19 +379,16 @@ struct EnhancedDayCell: View {
     var body: some View {
         VStack(spacing: 4) {
             ZStack {
-                // Selection background
                 RoundedRectangle(cornerRadius: 10)
                     .fill(isSelected ? Color.iosBlue : Color.clear)
                     .frame(width: 36, height: 36)
                 
-                // Today ring
                 if isToday && !isSelected {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(Color.iosBlue.opacity(0.4), lineWidth: 1.5)
                         .frame(width: 36, height: 36)
                 }
                 
-                // Day number
                 Text("\(calendar.component(.day, from: date))")
                     .font(.system(size: 15, weight: isSelected ? .bold : (isToday ? .semibold : .regular), design: .rounded))
                     .foregroundColor(
@@ -335,7 +398,6 @@ struct EnhancedDayCell: View {
                     )
             }
             
-            // Event indicator dot
             if hasEvents && !isSelected {
                 Circle()
                     .fill(Color.iosBlue.opacity(0.6))
