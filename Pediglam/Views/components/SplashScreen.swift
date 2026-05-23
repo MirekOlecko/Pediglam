@@ -1,18 +1,22 @@
 import SwiftUI
 
 struct SplashScreen: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var opacity: Double = 0
     @State private var scale: CGFloat = 0.9
     var onComplete: () -> Void
 
+    private var isDark: Bool { colorScheme == .dark }
+
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            (isDark ? Color.black : Color.white).ignoresSafeArea()
 
             Image("AlicjaLogo")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 260, height: 260)
+                .colorInvert(isDark)
                 .scaleEffect(scale)
                 .opacity(opacity)
         }
