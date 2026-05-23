@@ -24,6 +24,7 @@ struct FreeSlotCard: View {
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundColor(.primaryText)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
