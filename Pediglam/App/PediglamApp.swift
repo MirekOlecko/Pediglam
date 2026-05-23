@@ -2,6 +2,7 @@ import SwiftUI
 
 @main
 struct PediglamApp: App {
+    @StateObject private var themeManager = ThemeManager()
     @State private var showSplash = true
 
     var body: some Scene {
@@ -12,6 +13,7 @@ struct PediglamApp: App {
                 }
             } else {
                 MainTabView()
+                    .environmentObject(themeManager)
             }
         }
     }

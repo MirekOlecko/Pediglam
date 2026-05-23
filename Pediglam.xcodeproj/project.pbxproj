@@ -17,6 +17,7 @@
 		3C9A7F0C3E5F9036D6F0A54D /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD479B8B07550B6B7F3AC3C /* DateExtensions.swift */; };
 		43ADA3F14B75241811D60588 /* TimeSlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDC116E2127B8EB5789AF191 /* TimeSlot.swift */; };
 		4914E795EE3D078D848950F6 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458DEC64174DC3F6805E78FE /* CalendarViewModel.swift */; };
+		4EC136E72C94F56945A991CE /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB09D3158D96A517D0BFD55 /* ThemeManager.swift */; };
 		67D1EB3D1356C624A149C03E /* PediglamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC4FA74A96EE3C1C3238259 /* PediglamApp.swift */; };
 		6A62389C17F82F9A1577719D /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E8E3B6116356CC7D5DD3AB /* HeaderView.swift */; };
 		724197FFA506CDE9070A27DF /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB97D5E4D9310123452D217 /* SplashScreen.swift */; };
@@ -35,6 +36,7 @@
 /* Begin PBXFileReference section */
 		0E1912CE549CAD9AE8E2F345 /* CreateVisitSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVisitSheet.swift; sourceTree = "<group>"; };
 		18DA06F34A55430CA9CB89C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1DB09D3158D96A517D0BFD55 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		317F878D783AF05D20413EA8 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		34C5ED4763038A801BEC3F47 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		3CB97D5E4D9310123452D217 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
@@ -151,6 +153,7 @@
 			children = (
 				FB147D13E35F3EB1C695D6AC /* AppColors.swift */,
 				CDD479B8B07550B6B7F3AC3C /* DateExtensions.swift */,
+				1DB09D3158D96A517D0BFD55 /* ThemeManager.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -268,6 +271,7 @@
 				049518EA342A03AC40D14313 /* SettingsSheet.swift in Sources */,
 				724197FFA506CDE9070A27DF /* SplashScreen.swift in Sources */,
 				A19184AFF6AB7891B5242FE8 /* SummaryView.swift in Sources */,
+				4EC136E72C94F56945A991CE /* ThemeManager.swift in Sources */,
 				43ADA3F14B75241811D60588 /* TimeSlot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

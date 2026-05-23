@@ -2,33 +2,74 @@ import SwiftUI
 
 struct SettingsSheet: View {
     @ObservedObject var viewModel: CalendarViewModel
+    @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.dismiss) private var dismiss
     
     @State private var startPickerDate = Date()
     @State private var endPickerDate = Date()
     @State private var filterNoTitle = false
+    @State private var selectedTheme: AppTheme = .system
     
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("WORKING HOURS")) {
+                // Theme
+                Section {
+                    ForEach(AppTheme.allCases, id: \.self) { theme in
+                        Button(action: {
+                            selectedTheme = theme
+                            themeManager.theme = theme.rawValue
+                        }) {
+                            HStack(spacing: 12) {
+                                Image(systemName: theme.icon)
+                                    .font(.system(size: 18))
+                                    .foregroundColor(selectedTheme == theme ? .iosBlue : .primaryText)
+                                    .frame(width: 28)
+                                
+                                Text(theme.rawValue)
+                                    .font(.system(size: 16, design: .rounded))
+                                    .foregroundColor(.primaryText)
+                                
+                                Spacer()
+                                
+                                if selectedTheme == theme {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundColor(.iosBlue)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                } header: {
+                    Text("THEME")
+                }
+                
+                // Working hours
+                Section {
                     DatePicker("Start time", selection: $startPickerDate, displayedComponents: .hourAndMinute)
                         .tint(.iosBlue)
                     
                     DatePicker("End time", selection: $endPickerDate, displayedComponents: .hourAndMinute)
                         .tint(.iosBlue)
+                } header: {
+                    Text("WORKING HOURS")
                 }
                 
-                Section(header: Text("FILTERS")) {
+                // Filters
+                Section {
                     Toggle("Show clients only", isOn: $filterNoTitle)
                         .tint(.iosBlue)
                     
                     Text("Hide calendar events that don't have a title/client entered.")
                         .font(.caption)
                         .foregroundColor(.secondaryText)
+                } header: {
+                    Text("FILTERS")
                 }
                 
-                Section(header: Text("ABOUT")) {
+                // About
+                Section {
                     HStack {
                         Text("Name")
                         Spacer()
@@ -49,9 +90,10 @@ struct SettingsSheet: View {
                         Text("© 2026 Pediglam")
                             .foregroundColor(.secondaryText)
                     }
+                } header: {
+                    Text("ABOUT")
                 }
             }
-            .background(Color.systemBackground)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -84,6 +126,7 @@ struct SettingsSheet: View {
         startPickerDate = calendar.date(bySettingHour: viewModel.workStartHour, minute: viewModel.workStartMinute, second: 0, of: today) ?? today
         endPickerDate = calendar.date(bySettingHour: viewModel.workEndHour, minute: viewModel.workEndMinute, second: 0, of: today) ?? today
         filterNoTitle = viewModel.filterNoTitleEvents
+        selectedTheme = themeManager.currentTheme
     }
     
     private func saveSettings() {
@@ -96,5 +139,6 @@ struct SettingsSheet: View {
         viewModel.workEndHour = endComponents.hour ?? 19
         viewModel.workEndMinute = endComponents.minute ?? 0
         viewModel.filterNoTitleEvents = filterNoTitle
+        themeManager.theme = selectedTheme.rawValue
     }
 }

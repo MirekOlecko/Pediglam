@@ -3,11 +3,11 @@ import EventKit
 
 struct MainTabView: View {
     @StateObject private var viewModel = CalendarViewModel()
+    @EnvironmentObject private var themeManager: ThemeManager
     @State private var selectedTab = 0
     
     var body: some View {
         ZStack {
-            // Main tab content
             TabView(selection: $selectedTab) {
                 DashboardView(viewModel: viewModel)
                     .tabItem {
@@ -28,8 +28,9 @@ struct MainTabView: View {
                     .tag(2)
             }
             .tint(.iosBlue)
+            .preferredColorScheme(themeManager.currentTheme.colorScheme)
             
-            // Permission gate overlay — shown regardless of selected tab
+            // Permission gate overlay
             if viewModel.authorizationStatus == .notDetermined {
                 permissionGate
             } else if viewModel.authorizationStatus == .denied || viewModel.authorizationStatus == .restricted {
@@ -41,12 +42,11 @@ struct MainTabView: View {
     // MARK: - Permission Request Gate
     private var permissionGate: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color(UIColor.systemBackground).ignoresSafeArea()
             
             VStack(spacing: 24) {
                 Spacer()
                 
-                // Logo
                 Image("AlicjaLogo")
                     .resizable()
                     .scaledToFit()
@@ -89,7 +89,7 @@ struct MainTabView: View {
     // MARK: - Permission Denied Gate
     private var permissionDeniedGate: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color(UIColor.systemBackground).ignoresSafeArea()
             
             VStack(spacing: 24) {
                 Spacer()
