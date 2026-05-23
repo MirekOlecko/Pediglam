@@ -12,13 +12,21 @@ struct SplashScreen: View {
         ZStack {
             (isDark ? Color.black : Color.white).ignoresSafeArea()
 
-            Image("AlicjaLogo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 260, height: 260)
-                .colorInvert(isDark)
-                .scaleEffect(scale)
-                .opacity(opacity)
+            Group {
+                if isDark {
+                    Image("AlicjaLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .colorInvert()
+                } else {
+                    Image("AlicjaLogo")
+                        .resizable()
+                        .scaledToFit()
+                }
+            }
+            .frame(width: 260, height: 260)
+            .scaleEffect(scale)
+            .opacity(opacity)
         }
         .onAppear {
             withAnimation(.easeOut(duration: 0.8)) {
