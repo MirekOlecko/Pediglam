@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		049518EA342A03AC40D14313 /* SettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC77BC1F2331E5144A1E0AF4 /* SettingsSheet.swift */; };
+		0B42870EAA87329C4D9391FA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45E297641855AB84E61BE51 /* SettingsView.swift */; };
 		0B97C705FB272A66D2030C19 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D0E2B3A7E1B7B3C8CCFC87 /* ContentView.swift */; };
 		10AB76F6F3F093E61570EAF4 /* CalendarPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9E330F0FEE726F046D5D07 /* CalendarPickerView.swift */; };
 		10B08D9B4109C1A8A28442FD /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75194DDCA174E708F9FED8A0 /* DashboardView.swift */; };
@@ -58,6 +59,7 @@
 		CADCF1CBFB1BA2140470A543 /* EventDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailSheet.swift; sourceTree = "<group>"; };
 		CDD479B8B07550B6B7F3AC3C /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
 		DF9E330F0FEE726F046D5D07 /* CalendarPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarPickerView.swift; sourceTree = "<group>"; };
+		E45E297641855AB84E61BE51 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F0EF95639892244A80B68EFB /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		FB147D13E35F3EB1C695D6AC /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -70,6 +72,7 @@
 				58D0E2B3A7E1B7B3C8CCFC87 /* ContentView.swift */,
 				75194DDCA174E708F9FED8A0 /* DashboardView.swift */,
 				987F8CF3C950702BF39AC787 /* MainTabView.swift */,
+				E45E297641855AB84E61BE51 /* SettingsView.swift */,
 				2D19D087CE6DA8B1B83ADDBC /* components */,
 				DBAD5F8FBAB9309A4E7B5732 /* sheets */,
 			);
@@ -269,6 +272,7 @@
 				72B741F9C12B1866E1535B73 /* MainTabView.swift in Sources */,
 				67D1EB3D1356C624A149C03E /* PediglamApp.swift in Sources */,
 				049518EA342A03AC40D14313 /* SettingsSheet.swift in Sources */,
+				0B42870EAA87329C4D9391FA /* SettingsView.swift in Sources */,
 				724197FFA506CDE9070A27DF /* SplashScreen.swift in Sources */,
 				A19184AFF6AB7891B5242FE8 /* SummaryView.swift in Sources */,
 				4EC136E72C94F56945A991CE /* ThemeManager.swift in Sources */,

@@ -3,7 +3,6 @@ import EventKit
 
 struct ContentView: View {
     @ObservedObject var viewModel: CalendarViewModel
-    @Binding var showSettings: Bool
     @State private var selectedEventDetail: CalendarEvent? = nil
     @State private var showCreateVisit = false
     
@@ -14,7 +13,7 @@ struct ContentView: View {
             
             VStack(spacing: 0) {
                 // Header component
-                HeaderView(viewModel: viewModel, showSettings: $showSettings)
+                HeaderView(viewModel: viewModel)
                 
                 // Sub-header (Date picker & Work hours display)
                 HStack {
@@ -95,9 +94,6 @@ struct ContentView: View {
             }
             .frame(maxWidth: 600)
             .frame(maxWidth: .infinity, alignment: .center)
-        }
-        .sheet(isPresented: $showSettings) {
-            SettingsSheet(viewModel: viewModel)
         }
         .sheet(item: $selectedEventDetail) { event in
             EventDetailSheet(event: event)

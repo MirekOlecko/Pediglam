@@ -2,7 +2,6 @@ import SwiftUI
 
 struct HeaderView: View {
     @ObservedObject var viewModel: CalendarViewModel
-    @Binding var showSettings: Bool
     
     @State private var rotationDegree: Double = 0.0
     
@@ -21,8 +20,11 @@ struct HeaderView: View {
                 viewModel.loadEvents()
             }) {
                 Image(systemName: "arrow.clockwise")
-                    .font(.title3)
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(.iosBlue)
+                    .padding(8)
+                    .background(Color.iosBlue.opacity(0.08))
+                    .clipShape(Circle())
                     .rotationEffect(.degrees(rotationDegree))
             }
             .onChange(of: viewModel.isLoading) { loading in
@@ -31,15 +33,6 @@ struct HeaderView: View {
                         rotationDegree = 0.0
                     }
                 }
-            }
-            .padding(.trailing, 10)
-            
-            Button(action: {
-                showSettings = true
-            }) {
-                Image(systemName: "gear")
-                    .font(.title3)
-                    .foregroundColor(.secondaryText)
             }
         }
         .padding(.horizontal)

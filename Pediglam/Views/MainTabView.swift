@@ -15,7 +15,7 @@ struct MainTabView: View {
                     }
                     .tag(0)
                 
-                ContentView(viewModel: viewModel, showSettings: .constant(false))
+                ContentView(viewModel: viewModel)
                     .tabItem {
                         Label("Day", systemImage: "clock")
                     }
@@ -26,6 +26,12 @@ struct MainTabView: View {
                         Label("Calendar", systemImage: "calendar")
                     }
                     .tag(2)
+                
+                SettingsView(viewModel: viewModel)
+                    .tabItem {
+                        Label("Settings", systemImage: "gear")
+                    }
+                    .tag(3)
             }
             .tint(.iosBlue)
             .preferredColorScheme(themeManager.currentTheme.colorScheme)
