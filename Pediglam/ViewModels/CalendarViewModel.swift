@@ -232,16 +232,17 @@ class CalendarViewModel: ObservableObject {
     
     // MARK: - Write Operations
     
-    func createVisit(clientName: String, date: Date, hour: Int, minute: Int, durationMinutes: Int, serviceNote: String?) {
+    func createVisit(clientName: String, date: Date, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, serviceNote: String?) {
         let calendar = Calendar.current
         
-        guard let startDate = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: date),
-              let endDate = calendar.date(byAdding: .minute, value: durationMinutes, to: startDate) else {
+        guard let startDate = calendar.date(bySettingHour: startHour, minute: startMinute, second: 0, of: date),
+              let endDate = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: date),
+              endDate > startDate else {
             return
         }
         
         // Format title: "ClientName HH:MM serviceNote"
-        let timeStr = String(format: "%d:%02d", hour, minute)
+        let timeStr = String(format: "%d:%02d", startHour, startMinute)
         var title = "\(clientName) \(timeStr)"
         if let note = serviceNote, !note.trimmingCharacters(in: .whitespaces).isEmpty {
             title += " \(note)"

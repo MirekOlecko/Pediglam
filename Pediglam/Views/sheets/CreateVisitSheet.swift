@@ -6,17 +6,17 @@ struct CreateVisitSheet: View {
     
     @State private var clientName: String = ""
     @State private var selectedDate: Date
-    @State private var selectedHour: Int = 9
-    @State private var selectedMinute: Int = 0
-    @State private var selectedDuration: Int = 60
+    @State private var startHour: Int = 9
+    @State private var startMinute: Int = 0
+    @State private var endHour: Int = 10
+    @State private var endMinute: Int = 0
     @State private var serviceNote: String = ""
-    
-    private let durations = [15, 30, 45, 60, 75, 90, 105, 120]
     
     init(viewModel: CalendarViewModel) {
         self.viewModel = viewModel
         _selectedDate = State(initialValue: viewModel.selectedDate)
-        _selectedHour = State(initialValue: viewModel.workStartHour)
+        _startHour = State(initialValue: viewModel.workStartHour)
+        _endHour = State(initialValue: viewModel.workStartHour + 1)
     }
     
     var body: some View {
@@ -41,12 +41,13 @@ struct CreateVisitSheet: View {
                 
                 // Time
                 Section("Time") {
+                    // Start
                     HStack {
                         Text("Start")
                             .foregroundColor(.secondaryText)
                         Spacer()
                         
-                        Picker("Hour", selection: $selectedHour) {
+                        Picker("Hour", selection: $startHour) {
                             ForEach(6...22, id: \.self) { h in
                                 Text(String(format: "%02d", h)).tag(h)
                             }
@@ -59,7 +60,7 @@ struct CreateVisitSheet: View {
                             .font(.title2)
                             .foregroundColor(.primaryText)
                         
-                        Picker("Minute", selection: $selectedMinute) {
+                        Picker("Minute", selection: $startMinute) {
                             ForEach([0, 15, 30, 45], id: \.self) { m in
                                 Text(String(format: "%02d", m)).tag(m)
                             }
@@ -69,12 +70,34 @@ struct CreateVisitSheet: View {
                         .clipped()
                     }
                     
-                    Picker("Duration", selection: $selectedDuration) {
-                        ForEach(durations, id: \.self) { d in
-                            Text(durationLabel(d)).tag(d)
+                    // End
+                    HStack {
+                        Text("End")
+                            .foregroundColor(.secondaryText)
+                        Spacer()
+                        
+                        Picker("Hour", selection: $endHour) {
+                            ForEach(6...22, id: \.self) { h in
+                                Text(String(format: "%02d", h)).tag(h)
+                            }
                         }
+                        .pickerStyle(.wheel)
+                        .frame(width: 70, height: 80)
+                        .clipped()
+                        
+                        Text(":")
+                            .font(.title2)
+                            .foregroundColor(.primaryText)
+                        
+                        Picker("Minute", selection: $endMinute) {
+                            ForEach([0, 15, 30, 45], id: \.self) { m in
+                                Text(String(format: "%02d", m)).tag(m)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        .frame(width: 70, height: 80)
+                        .clipped()
                     }
-                    .tint(.iosBlue)
                 }
                 
                 // Preview
@@ -95,11 +118,11 @@ struct CreateVisitSheet: View {
                         Spacer()
                         
                         VStack(alignment: .trailing, spacing: 4) {
-                            Text(timeString)
+                            Text("\(startTimeString) – \(endTimeString)")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.primaryText)
                             
-                            Text(durationLabel(selectedDuration))
+                            Text(durationString)
                                 .font(.system(size: 12))
                                 .foregroundColor(.secondaryText)
                         }
@@ -120,9 +143,10 @@ struct CreateVisitSheet: View {
                         viewModel.createVisit(
                             clientName: clientName.isEmpty ? "Client" : clientName,
                             date: selectedDate,
-                            hour: selectedHour,
-                            minute: selectedMinute,
-                            durationMinutes: selectedDuration,
+                            startHour: startHour,
+                            startMinute: startMinute,
+                            endHour: endHour,
+                            endMinute: endMinute,
                             serviceNote: serviceNote.isEmpty ? nil : serviceNote
                         )
                         dismiss()
@@ -134,16 +158,24 @@ struct CreateVisitSheet: View {
         }
     }
     
-    private var timeString: String {
-        String(format: "%d:%02d", selectedHour, selectedMinute)
+    private var startTimeString: String {
+        String(format: "%d:%02d", startHour, startMinute)
     }
     
-    private func durationLabel(_ minutes: Int) -> String {
-        if minutes < 60 {
-            return "\(minutes) min"
+    private var endTimeString: String {
+        String(format: "%d:%02d", endHour, endMinute)
+    }
+    
+    private var durationString: String {
+        let startMinutes = startHour * 60 + startMinute
+        let endMinutes = endHour * 60 + endMinute
+        let diff = max(0, endMinutes - startMinutes)
+        
+        if diff < 60 {
+            return "\(diff) min"
         } else {
-            let h = minutes / 60
-            let m = minutes % 60
+            let h = diff / 60
+            let m = diff % 60
             return m == 0 ? "\(h)h" : "\(h)h \(m)min"
         }
     }
