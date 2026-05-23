@@ -12,6 +12,9 @@ struct CreateVisitSheet: View {
     @State private var endMinute: Int = 0
     @State private var serviceNote: String = ""
     
+    private let hours = Array(6...22)
+    private let minutes = Array(stride(from: 0, through: 55, by: 5))
+    
     init(viewModel: CalendarViewModel) {
         self.viewModel = viewModel
         _selectedDate = State(initialValue: viewModel.selectedDate)
@@ -41,63 +44,8 @@ struct CreateVisitSheet: View {
                 
                 // Time
                 Section("Time") {
-                    // Start
-                    HStack {
-                        Text("Start")
-                            .foregroundColor(.secondaryText)
-                        Spacer()
-                        
-                        Picker("Hour", selection: $startHour) {
-                            ForEach(6...22, id: \.self) { h in
-                                Text(String(format: "%02d", h)).tag(h)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(width: 70, height: 80)
-                        .clipped()
-                        
-                        Text(":")
-                            .font(.title2)
-                            .foregroundColor(.primaryText)
-                        
-                        Picker("Minute", selection: $startMinute) {
-                            ForEach([0, 15, 30, 45], id: \.self) { m in
-                                Text(String(format: "%02d", m)).tag(m)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(width: 70, height: 80)
-                        .clipped()
-                    }
-                    
-                    // End
-                    HStack {
-                        Text("End")
-                            .foregroundColor(.secondaryText)
-                        Spacer()
-                        
-                        Picker("Hour", selection: $endHour) {
-                            ForEach(6...22, id: \.self) { h in
-                                Text(String(format: "%02d", h)).tag(h)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(width: 70, height: 80)
-                        .clipped()
-                        
-                        Text(":")
-                            .font(.title2)
-                            .foregroundColor(.primaryText)
-                        
-                        Picker("Minute", selection: $endMinute) {
-                            ForEach([0, 15, 30, 45], id: \.self) { m in
-                                Text(String(format: "%02d", m)).tag(m)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(width: 70, height: 80)
-                        .clipped()
-                    }
+                    timePickerRow(label: "Start", hour: $startHour, minute: $startMinute)
+                    timePickerRow(label: "End", hour: $endHour, minute: $endMinute)
                 }
                 
                 // Preview
@@ -156,6 +104,44 @@ struct CreateVisitSheet: View {
                 }
             }
         }
+    }
+    
+    // MARK: - Time Picker Row
+    private func timePickerRow(label: String, hour: Binding<Int>, minute: Binding<Int>) -> some View {
+        HStack(spacing: 0) {
+            Text(label)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(.secondaryText)
+                .frame(width: 50, alignment: .leading)
+            
+            Spacer()
+            
+            Picker("Hour", selection: hour) {
+                ForEach(hours, id: \.self) { h in
+                    Text(String(format: "%02d", h))
+                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .tag(h)
+                }
+            }
+            .pickerStyle(.wheel)
+            .frame(width: 80, height: 110)
+            
+            Text(":")
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(.primaryText)
+                .frame(width: 16)
+            
+            Picker("Minute", selection: minute) {
+                ForEach(minutes, id: \.self) { m in
+                    Text(String(format: "%02d", m))
+                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .tag(m)
+                }
+            }
+            .pickerStyle(.wheel)
+            .frame(width: 80, height: 110)
+        }
+        .padding(.vertical, 4)
     }
     
     private var startTimeString: String {
