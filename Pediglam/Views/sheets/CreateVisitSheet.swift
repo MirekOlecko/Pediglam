@@ -9,6 +9,8 @@ struct CreateVisitSheet: View {
     @State private var startTime: Date
     @State private var endTime: Date
     @State private var serviceNote: String = ""
+    @State private var showConflictAlert = false
+    @State private var conflictMessage = ""
     
     init(viewModel: CalendarViewModel) {
         self.viewModel = viewModel
@@ -85,6 +87,11 @@ struct CreateVisitSheet: View {
             }
             .navigationTitle("New Visit")
             .navigationBarTitleDisplayMode(.inline)
+            .alert("Time Conflict", isPresented: $showConflictAlert) {
+                Button("OK") { }
+            } message: {
+                Text(conflictMessage)
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -95,7 +102,7 @@ struct CreateVisitSheet: View {
                         let startComp = cal.dateComponents([.hour, .minute], from: startTime)
                         let endComp = cal.dateComponents([.hour, .minute], from: endTime)
                         
-                        viewModel.createVisit(
+                        let success = viewModel.createVisit(
                             clientName: clientName.isEmpty ? "Client" : clientName,
                             date: selectedDate,
                             startHour: startComp.hour ?? 9,
@@ -104,7 +111,13 @@ struct CreateVisitSheet: View {
                             endMinute: endComp.minute ?? 0,
                             serviceNote: serviceNote.isEmpty ? nil : serviceNote
                         )
-                        dismiss()
+                        
+                        if success {
+                            dismiss()
+                        } else if let error = viewModel.error {
+                            conflictMessage = error
+                            showConflictAlert = true
+                        }
                     }
                     .fontWeight(.semibold)
                     .disabled(clientName.trimmingCharacters(in: .whitespaces).isEmpty)

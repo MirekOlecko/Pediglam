@@ -240,13 +240,31 @@ class CalendarViewModel: ObservableObject {
     
     // MARK: - Write Operations
     
-    func createVisit(clientName: String, date: Date, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, serviceNote: String?) {
+    func conflictingEvents(start: Date, end: Date) -> [CalendarEvent] {
+        let events = calendarService.fetchEvents(from: start, to: end)
+        return events
+            .filter { !$0.isAllDay }
+            .filter { event in
+                // Check overlap: event starts before our end AND ends after our start
+                event.startDate < end && event.endDate > start
+            }
+            .map { CalendarEvent(ekEvent: $0) }
+    }
+    
+    func createVisit(clientName: String, date: Date, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, serviceNote: String?) -> Bool {
         let calendar = Calendar.current
         
         guard let startDate = calendar.date(bySettingHour: startHour, minute: startMinute, second: 0, of: date),
               let endDate = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: date),
               endDate > startDate else {
-            return
+            return false
+        }
+        
+        // Check for conflicts
+        let conflicts = conflictingEvents(start: startDate, end: endDate)
+        if !conflicts.isEmpty {
+            self.error = "Time conflict with: \(conflicts.map { $0.clientName }.joined(separator: ", "))"
+            return false
         }
         
         // Format title: "ClientName HH:MM serviceNote"
@@ -260,8 +278,10 @@ class CalendarViewModel: ObservableObject {
             _ = try calendarService.createEvent(title: title, startDate: startDate, endDate: endDate)
             loadEvents()
             loadDashboardEvents()
+            return true
         } catch {
             self.error = "Failed to create visit: \(error.localizedDescription)"
+            return false
         }
     }
     
