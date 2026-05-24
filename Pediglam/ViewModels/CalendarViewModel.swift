@@ -82,7 +82,11 @@ class CalendarViewModel: ObservableObject {
         case year = "Year"
     }
     
-    @Published var dashboardRange: DashboardRange = .week
+    @Published var dashboardRange: DashboardRange = .week {
+        didSet {
+            UserDefaults.standard.set(dashboardRange.rawValue, forKey: "dashboardRange")
+        }
+    }
     @Published var dashboardEvents: [CalendarEvent] = []
     @Published var dashboardIsLoading = false
     
@@ -209,6 +213,10 @@ class CalendarViewModel: ObservableObject {
     
     init() {
         self.authorizationStatus = calendarService.checkAuthorizationStatus()
+        if let saved = UserDefaults.standard.string(forKey: "dashboardRange"),
+           let range = DashboardRange(rawValue: saved) {
+            self.dashboardRange = range
+        }
     }
     
     func requestAccess() {
