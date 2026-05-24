@@ -10,103 +10,101 @@ struct SettingsView: View {
     @State private var selectedTheme: AppTheme = .system
     
     var body: some View {
-        ZStack {
-            Color.systemBackground.ignoresSafeArea()
-            
-            NavigationView {
-                Form {
-                    // Theme
-                    Section {
-                        ForEach(AppTheme.allCases, id: \.self) { theme in
-                            Button(action: {
-                                selectedTheme = theme
-                                themeManager.theme = theme.rawValue
-                            }) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: theme.icon)
-                                        .font(.system(size: 18))
-                                        .foregroundColor(selectedTheme == theme ? .iosBlue : .primaryText)
-                                        .frame(width: 28)
-                                    
-                                    Text(theme.rawValue)
-                                        .font(.system(size: 16, design: .rounded))
-                                        .foregroundColor(.primaryText)
-                                    
-                                    Spacer()
-                                    
-                                    if selectedTheme == theme {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(size: 14, weight: .bold))
-                                            .foregroundColor(.iosBlue)
-                                    }
+        NavigationView {
+            Form {
+                // Theme
+                Section {
+                    ForEach(AppTheme.allCases, id: \.self) { theme in
+                        Button(action: {
+                            selectedTheme = theme
+                            themeManager.theme = theme.rawValue
+                        }) {
+                            HStack(spacing: 12) {
+                                Image(systemName: theme.icon)
+                                    .font(.system(size: 18))
+                                    .foregroundColor(selectedTheme == theme ? .iosBlue : .primaryText)
+                                    .frame(width: 28)
+                                
+                                Text(theme.rawValue)
+                                    .font(.system(size: 16, design: .rounded))
+                                    .foregroundColor(.primaryText)
+                                
+                                Spacer()
+                                
+                                if selectedTheme == theme {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundColor(.iosBlue)
                                 }
-                                .padding(.vertical, 4)
                             }
+                            .padding(.vertical, 4)
                         }
-                    } header: {
-                        Text("THEME")
                     }
-                    
-                    // Working hours
-                    Section {
-                        DatePicker("Start time", selection: $startPickerDate, displayedComponents: .hourAndMinute)
-                            .tint(.iosBlue)
-                            .onChange(of: startPickerDate) { _ in saveWorkHours() }
-                        
-                        DatePicker("End time", selection: $endPickerDate, displayedComponents: .hourAndMinute)
-                            .tint(.iosBlue)
-                            .onChange(of: endPickerDate) { _ in saveWorkHours() }
-                    } header: {
-                        Text("WORKING HOURS")
-                    }
-                    
-                    // Filters
-                    Section {
-                        Toggle("Show clients only", isOn: $filterNoTitle)
-                            .tint(.iosBlue)
-                            .onChange(of: filterNoTitle) { newValue in
-                                viewModel.filterNoTitleEvents = newValue
-                            }
-                        
-                        Text("Hide calendar events that don't have a title/client entered.")
-                            .font(.caption)
-                            .foregroundColor(.secondaryText)
-                    } header: {
-                        Text("FILTERS")
-                    }
-                    
-                    // About
-                    Section {
-                        HStack {
-                            Text("Name")
-                            Spacer()
-                            Text("Pediglam")
-                                .foregroundColor(.secondaryText)
-                        }
-                        
-                        HStack {
-                            Text("Version")
-                            Spacer()
-                            Text("1.0.0")
-                                .foregroundColor(.secondaryText)
-                        }
-                        
-                        HStack {
-                            Text("Copyright")
-                            Spacer()
-                            Text("© 2026 Pediglam")
-                                .foregroundColor(.secondaryText)
-                        }
-                    } header: {
-                        Text("ABOUT")
-                    }
+                } header: {
+                    Text("THEME")
                 }
-                .scrollContentBackground(.hidden)
-                .navigationTitle("Settings")
-                .navigationBarTitleDisplayMode(.inline)
+                
+                // Working hours
+                Section {
+                    DatePicker("Start time", selection: $startPickerDate, displayedComponents: .hourAndMinute)
+                        .tint(.iosBlue)
+                        .onChange(of: startPickerDate) { _ in saveWorkHours() }
+                    
+                    DatePicker("End time", selection: $endPickerDate, displayedComponents: .hourAndMinute)
+                        .tint(.iosBlue)
+                        .onChange(of: endPickerDate) { _ in saveWorkHours() }
+                } header: {
+                    Text("WORKING HOURS")
+                }
+                
+                // Filters
+                Section {
+                    Toggle("Show clients only", isOn: $filterNoTitle)
+                        .tint(.iosBlue)
+                        .onChange(of: filterNoTitle) { newValue in
+                            viewModel.filterNoTitleEvents = newValue
+                        }
+                    
+                    Text("Hide calendar events that don't have a title/client entered.")
+                        .font(.caption)
+                        .foregroundColor(.secondaryText)
+                } header: {
+                    Text("FILTERS")
+                }
+                
+                // About
+                Section {
+                    HStack {
+                        Text("Name")
+                        Spacer()
+                        Text("Pediglam")
+                            .foregroundColor(.secondaryText)
+                    }
+                    
+                    HStack {
+                        Text("Version")
+                        Spacer()
+                        Text("1.0.0")
+                            .foregroundColor(.secondaryText)
+                    }
+                    
+                    HStack {
+                        Text("Copyright")
+                        Spacer()
+                        Text("© 2026 Pediglam")
+                            .foregroundColor(.secondaryText)
+                    }
+                } header: {
+                    Text("ABOUT")
+                }
             }
-            .navigationViewStyle(.stack)
+            .scrollContentBackground(.hidden)
+            .background(Color.systemBackground)
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
         }
+        .navigationViewStyle(.stack)
+        .background(Color.systemBackground)
         .onAppear {
             loadCurrentSettings()
         }
