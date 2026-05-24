@@ -58,6 +58,7 @@ struct CalendarPickerView: View {
             
             // Calendar card — collapsible
             calendarCard
+                .padding(.bottom, 8)
             
             Divider()
                 .background(Color.separator)
