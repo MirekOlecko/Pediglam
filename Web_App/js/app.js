@@ -9,6 +9,7 @@ const App = {
     workStartHour: 9,
     workEndHour: 19,
     filterNoTitle: true,
+    calendarAuthorized: false,
     visits: [], // { id, clientName, serviceNote, startDate, endDate }
     nextId: 1
 };
@@ -17,8 +18,17 @@ const App = {
 function init() {
     loadState();
     applyTheme();
+    if (!App.calendarAuthorized) {
+        renderPermissionGate();
+    } else {
+        render();
+    }
+}
+
+function grantCalendarAccess() {
+    App.calendarAuthorized = true;
+    saveState();
     render();
-    window.addEventListener('resize', () => { applyTheme(); });
 }
 
 // === Persistence ===
@@ -31,6 +41,7 @@ function loadState() {
         if (saved.filterNoTitle !== undefined) App.filterNoTitle = saved.filterNoTitle;
         if (saved.theme) App.theme = saved.theme;
         if (saved.dashboardRange) App.dashboardRange = saved.dashboardRange;
+        if (saved.calendarAuthorized !== undefined) App.calendarAuthorized = saved.calendarAuthorized;
     } catch(e) {}
 }
 
@@ -42,7 +53,8 @@ function saveState() {
         workEndHour: App.workEndHour,
         filterNoTitle: App.filterNoTitle,
         theme: App.theme,
-        dashboardRange: App.dashboardRange
+        dashboardRange: App.dashboardRange,
+        calendarAuthorized: App.calendarAuthorized
     }));
 }
 
@@ -205,6 +217,25 @@ function getDashboardStats() {
 }
 
 // === Render ===
+function renderPermissionGate() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100dvh;padding:32px;text-align:center;background:var(--bg)">
+            <div style="font-size:80px;margin-bottom:24px">💅</div>
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:12px;letter-spacing:-0.5px">Welcome to Pediglam</h1>
+            <p style="font-size:15px;color:var(--text-secondary);max-width:280px;line-height:1.5;margin-bottom:32px">
+                A minimalist app for managing your free time slots. See available gaps in your workday in seconds.
+            </p>
+            <button onclick="grantCalendarAccess()" style="width:100%;max-width:300px;padding:14px;border:none;border-radius:14px;background:var(--blue);color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,122,255,0.3)">
+                Allow Calendar Access
+            </button>
+            <p style="font-size:11px;color:var(--text-secondary);margin-top:16px;opacity:0.6">
+                Your visits sync via .ics import/export
+            </p>
+        </div>
+    `;
+}
+
 function render() {
     const app = document.getElementById('app');
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
