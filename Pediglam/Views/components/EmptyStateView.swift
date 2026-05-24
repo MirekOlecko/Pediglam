@@ -7,22 +7,22 @@ struct EmptyStateView: View {
             
             ZStack {
                 Circle()
-                    .fill(Color.freeColor.opacity(0.1))
-                    .frame(width: 120, height: 120)
+                    .fill(AppStyle.freeGradient)
+                    .frame(width: 96, height: 96)
+                    .shadow(color: Color.freeColor.opacity(0.24), radius: 18, x: 0, y: 10)
                 
                 Image(systemName: "calendar.badge.checkmark")
-                    .font(.system(size: 50))
-                    .foregroundColor(.freeColor)
-                    .shadow(color: Color.freeColor.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .font(.system(size: 38, weight: .bold))
+                    .foregroundColor(.white)
             }
             
             VStack(spacing: 8) {
                 Text("You're completely free today!")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
                     .foregroundColor(.primaryText)
                 
                 Text("No appointments scheduled during working hours.")
-                    .font(.system(size: 14))
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundColor(.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
@@ -43,14 +43,15 @@ struct EmptyStateView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
-                .background(Color.iosBlue)
-                .cornerRadius(12)
-                .shadow(color: Color.iosBlue.opacity(0.25), radius: 6, x: 0, y: 3)
+                .background(AppStyle.accentGradient)
+                .clipShape(.rect(cornerRadius: AppStyle.controlRadius, style: .continuous))
+                .shadow(color: Color.iosBlue.opacity(0.25), radius: 12, x: 0, y: 7)
             }
             .padding(.top, 8)
             
             Spacer()
         }
         .padding(.vertical)
+        .padding(.horizontal)
     }
 }

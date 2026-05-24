@@ -5,94 +5,85 @@ struct ContentView: View {
     @ObservedObject var viewModel: CalendarViewModel
     @State private var selectedEventDetail: CalendarEvent? = nil
     @State private var showCreateVisit = false
-    
+
+    private var workHoursText: String {
+        let startStr = String(format: "%d:%02d", viewModel.workStartHour, viewModel.workStartMinute)
+        let endStr = String(format: "%d:%02d", viewModel.workEndHour, viewModel.workEndMinute)
+        return "\(startStr) - \(endStr)"
+    }
+
     var body: some View {
         ZStack {
-            Color.systemBackground
-                .ignoresSafeArea()
-            
+            PremiumBackground()
+
             VStack(spacing: 0) {
-                // Header component
-                HeaderView()
-                
-                // Sub-header (Date picker & Work hours display)
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(viewModel.selectedDate.formattedPolishHeader())
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundColor(.primaryText)
-                        
-                        let startStr = String(format: "%d:%02d", viewModel.workStartHour, viewModel.workStartMinute)
-                        let endStr = String(format: "%d:%02d", viewModel.workEndHour, viewModel.workEndMinute)
-                        Text("Working hours: \(startStr) – \(endStr)")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(.secondaryText)
+                PremiumScreenHeader(
+                    title: "Day",
+                    subtitle: viewModel.selectedDate.formattedPolishHeader(),
+                    systemImage: "clock.fill"
+                ) {
+                    HStack(spacing: 10) {
+                        PremiumIconButton(systemName: "plus") {
+                            showCreateVisit = true
+                        }
+
+                        DatePicker(
+                            "",
+                            selection: $viewModel.selectedDate,
+                            displayedComponents: [.date]
+                        )
+                        .labelsHidden()
+                        .datePickerStyle(.compact)
+                        .tint(.iosBlue)
                     }
-                    
-                    Spacer()
-                    
-                    // Add visit button
-                    Button(action: { showCreateVisit = true }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.iosBlue)
-                    }
-                    
-                    DatePicker(
-                        "",
-                        selection: $viewModel.selectedDate,
-                        displayedComponents: [.date]
-                    )
-                    .labelsHidden()
-                    .datePickerStyle(.compact)
-                    .tint(.iosBlue)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 12)
-                
-                Divider()
-                    .background(Color.separator)
-                
-                // Main content body
+
                 if viewModel.isLoading && viewModel.slots.isEmpty {
                     Spacer()
                     ProgressView()
                         .tint(.iosBlue)
                     Spacer()
-                } else if viewModel.slots.isEmpty {
-                    EmptyStateView()
                 } else {
                     ScrollView {
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.slots) { slot in
-                                if slot.type == .free {
-                                    FreeSlotCard(slot: slot)
-                                } else {
-                                    BusySlotCard(slot: slot) {
-                                        if let event = slot.associatedEvent {
-                                            selectedEventDetail = event
+                        VStack(spacing: 16) {
+                            DayOverviewCard(schedule: viewModel.daySchedule, workHours: workHoursText)
+
+                            if viewModel.slots.isEmpty {
+                                EmptyStateView()
+                                    .frame(minHeight: 360)
+                            } else {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    PremiumSectionTitle(title: "Schedule", trailing: "\(viewModel.slots.count) slots")
+
+                                    LazyVStack(spacing: 12) {
+                                        ForEach(viewModel.slots) { slot in
+                                            if slot.type == .free {
+                                                FreeSlotCard(slot: slot)
+                                            } else {
+                                                BusySlotCard(slot: slot) {
+                                                    if let event = slot.associatedEvent {
+                                                        selectedEventDetail = event
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
+
+                                SummaryView(schedule: viewModel.daySchedule)
                             }
                         }
-                        .padding(.horizontal)
-                        .padding(.top, 16)
-                        .padding(.bottom, 24)
+                        .padding(.horizontal, AppStyle.horizontalPadding)
+                        .padding(.top, 8)
+                        .padding(.bottom, 28)
                     }
+                    .scrollIndicators(.hidden)
                     .refreshable {
                         viewModel.loadEvents()
                     }
-                    
-                    Divider()
-                        .background(Color.separator)
-                    
-                    SummaryView(schedule: viewModel.daySchedule)
-                        .padding(.vertical, 12)
-                        .background(Color.systemBackground)
                 }
             }
-            .frame(maxWidth: 600)
+            .frame(maxWidth: 640)
             .frame(maxWidth: .infinity, alignment: .center)
         }
         .sheet(item: $selectedEventDetail) { event in
@@ -104,5 +95,51 @@ struct ContentView: View {
         .onAppear {
             viewModel.loadEvents()
         }
+    }
+}
+
+private struct DayOverviewCard: View {
+    let schedule: DaySchedule
+    let workHours: String
+
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(AppStyle.accentGradient)
+                    .frame(width: 52, height: 52)
+                    .shadow(color: Color.iosBlue.opacity(0.22), radius: 12, x: 0, y: 7)
+
+                Image(systemName: "calendar.badge.clock")
+                    .font(.system(size: 21, weight: .bold))
+                    .foregroundColor(.white)
+            }
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Working hours")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundColor(.secondaryText)
+
+                Text(workHours)
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.primaryText)
+                    .lineLimit(1)
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 5) {
+                Text("Free")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundColor(.secondaryText)
+
+                Text(schedule.totalFreeTime.formattedDuration())
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.freeColor)
+                    .lineLimit(1)
+            }
+        }
+        .padding(18)
+        .premiumCard(cornerRadius: 24, shadowRadius: 18)
     }
 }

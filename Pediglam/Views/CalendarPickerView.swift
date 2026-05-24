@@ -6,44 +6,45 @@ struct CalendarPickerView: View {
     @State private var selectedEventDetail: CalendarEvent? = nil
     @State private var showCreateVisit = false
     @State private var calendarExpanded = true
-    
     @State private var displayedMonth = Date()
-    
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 7)
+
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
     private let calendar = Calendar.current
-    
+
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text("Select Date")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
-                    .foregroundColor(.primaryText)
-                
-                Spacer()
-                
-                Button(action: { showCreateVisit = true }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundColor(.iosBlue)
-                        .padding(.trailing, 6)
+        ZStack {
+            PremiumBackground()
+
+            VStack(spacing: 0) {
+                PremiumScreenHeader(
+                    title: "Calendar",
+                    subtitle: viewModel.selectedDate.formattedPolishHeader(),
+                    systemImage: "calendar"
+                ) {
+                    PremiumIconButton(systemName: "plus") {
+                        showCreateVisit = true
+                    }
+                }
+
+                ScrollView {
+                    VStack(spacing: 16) {
+                        calendarCard
+
+                        calendarContentBelow
+                    }
+                    .padding(.horizontal, AppStyle.horizontalPadding)
+                    .padding(.top, 2)
+                    .padding(.bottom, 28)
+                }
+                .scrollIndicators(.hidden)
+                .refreshable {
+                    viewModel.loadEvents()
+                    viewModel.loadMonthEvents(month: displayedMonth)
                 }
             }
-            .padding(.horizontal)
-            .padding(.top, 10)
-            .padding(.bottom, 12)
-            
-            // Calendar card — collapsible
-            calendarCard
-                .padding(.bottom, 8)
-            
-            Divider()
-                .background(Color.separator)
-            
-            // Content below calendar
-            calendarContentBelow
+            .frame(maxWidth: 640)
+            .frame(maxWidth: .infinity)
         }
-        .background(Color.systemBackground)
         .sheet(item: $selectedEventDetail) { event in
             EventDetailSheet(event: event)
         }
@@ -56,7 +57,7 @@ struct CalendarPickerView: View {
             viewModel.loadMonthEvents(month: viewModel.selectedDate)
         }
         .onChange(of: viewModel.selectedDate) { newDate in
-            if !calendar.isDate(newDate, inSameDayAs: displayedMonth) {
+            if !calendar.isDate(newDate, equalTo: displayedMonth, toGranularity: .month) {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     displayedMonth = newDate
                 }
@@ -66,330 +67,252 @@ struct CalendarPickerView: View {
             viewModel.loadMonthEvents(month: newMonth)
         }
     }
-    
-    // MARK: - Calendar Card (collapsible)
+
     private var calendarCard: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 16) {
+            calendarTopBar
+
             if calendarExpanded {
-                // Full calendar
                 fullCalendar
-            } else {
-                // Compact header
-                compactHeader
+                    .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.cardBackground)
-                .shadow(color: .black.opacity(0.03), radius: 8, x: 0, y: 2)
-        )
-        .padding(.horizontal)
-        .padding(.top, 4)
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: calendarExpanded)
+        .padding(16)
+        .premiumCard(cornerRadius: 26, shadowRadius: 18)
+        .animation(.spring(response: 0.4, dampingFraction: 0.86), value: calendarExpanded)
     }
-    
-    // MARK: - Compact Header
-    private var compactHeader: some View {
-        Button(action: {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                calendarExpanded = true
-            }
-        }) {
-            HStack(spacing: 8) {
-                Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundColor(.primaryText)
-                
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 14, weight: .bold))
+
+    private var calendarTopBar: some View {
+        HStack(spacing: 12) {
+            Button {
+                shiftMonth(-1)
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.iosBlue)
-                
-                Spacer()
-                
-                // Today button
-                Button(action: {
-                    viewModel.selectedDate = Date()
-                    displayedMonth = Date()
-                }) {
-                    Text("Today")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .foregroundColor(calendar.isDate(Date(), inSameDayAs: viewModel.selectedDate) ? .white : .iosBlue)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                        .background(
-                            calendar.isDate(Date(), inSameDayAs: viewModel.selectedDate)
-                                ? Color.iosBlue
-                                : Color.iosBlue.opacity(0.1)
-                        )
-                        .cornerRadius(10)
-                }
-                
-                Text(viewModel.selectedDate.formattedPolishHeader())
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.secondaryText)
-                    .lineLimit(1)
+                    .frame(width: 34, height: 34)
+                    .background(Color.iosBlue.opacity(0.10))
+                    .clipShape(Circle())
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
+            .buttonStyle(.plain)
+
+            Button {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.86)) {
+                    calendarExpanded.toggle()
+                }
+            } label: {
+                VStack(spacing: 2) {
+                    Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.primaryText)
+                        .lineLimit(1)
+
+                    Text(calendarExpanded ? "Tap to compact" : "Tap to expand")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.secondaryText)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                shiftMonth(1)
+            } label: {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.iosBlue)
+                    .frame(width: 34, height: 34)
+                    .background(Color.iosBlue.opacity(0.10))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(PlainButtonStyle())
     }
-    
-    // MARK: - Full Calendar
+
     private var fullCalendar: some View {
-        VStack(spacing: 0) {
-            // Month navigation
-            HStack(spacing: 0) {
-                Button(action: { shiftMonth(-1) }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(.iosBlue)
-                        .frame(width: 32, height: 32)
-                }
-                
-                Spacer()
-                
-                Button(action: { withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { calendarExpanded = false } }) {
-                    HStack(spacing: 4) {
-                        Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                            .foregroundColor(.primaryText)
-                        
-                        Image(systemName: "chevron.up")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.iosBlue)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-                
-                Spacer()
-                
-                Button(action: { shiftMonth(1) }) {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(.iosBlue)
-                        .frame(width: 32, height: 32)
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 14)
-            .padding(.bottom, 12)
-            
-            // Today + selected date
+        VStack(spacing: 14) {
             HStack {
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.25)) {
                         viewModel.selectedDate = Date()
                         displayedMonth = Date()
                     }
-                }) {
+                } label: {
                     Text("Today")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundColor(calendar.isDate(Date(), inSameDayAs: viewModel.selectedDate) ? .white : .iosBlue)
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundColor(calendar.isDateInToday(viewModel.selectedDate) ? .white : .iosBlue)
                         .padding(.horizontal, 14)
-                        .padding(.vertical, 5)
-                        .background(
-                            calendar.isDate(Date(), inSameDayAs: viewModel.selectedDate)
-                                ? Color.iosBlue
-                                : Color.iosBlue.opacity(0.1)
-                        )
-                        .cornerRadius(12)
+                        .padding(.vertical, 7)
+                        .background(calendar.isDateInToday(viewModel.selectedDate) ? AnyShapeStyle(AppStyle.accentGradient) : AnyShapeStyle(Color.iosBlue.opacity(0.10)))
+                        .clipShape(.capsule)
                 }
-                
+                .buttonStyle(.plain)
+
                 Spacer()
-                
-                Text(viewModel.selectedDate.formattedPolishHeader())
-                    .font(.system(size: 12, weight: .medium))
+
+                Text(viewModel.selectedDate.formattedShortDate())
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundColor(.secondaryText)
-                    .lineLimit(1)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 10)
-            
-            Divider()
-                .background(Color.separator)
-                .padding(.horizontal, 20)
-            
-            // Day headers
-            HStack(spacing: 2) {
+
+            HStack(spacing: 4) {
                 ForEach(dayHeaders, id: \.self) { day in
                     Text(day)
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundColor(day == "Sat" || day == "Sun" ? .secondaryText.opacity(0.7) : .secondaryText)
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(day == "Sat" || day == "Sun" ? .secondaryText.opacity(0.72) : .secondaryText)
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
-            
-            // Calendar grid
-            LazyVGrid(columns: columns, spacing: 2) {
-                ForEach(daysInMonth(), id: \.self) { date in
-                    if let date = date {
-                        EnhancedDayCell(
-                            date: date,
-                            isSelected: calendar.isDate(date, inSameDayAs: viewModel.selectedDate),
-                            isToday: calendar.isDateInToday(date),
-                            isCurrentMonth: calendar.isDate(date, equalTo: displayedMonth, toGranularity: .month),
-                            hasEvents: checkHasEvents(for: date)
-                        )
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+
+            LazyVGrid(columns: columns, spacing: 5) {
+                ForEach(Array(daysInMonth().enumerated()), id: \.offset) { _, date in
+                    if let date {
+                        Button {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.78)) {
                                 viewModel.selectedDate = date
                             }
+                        } label: {
+                            EnhancedDayCell(
+                                date: date,
+                                isSelected: calendar.isDate(date, inSameDayAs: viewModel.selectedDate),
+                                isToday: calendar.isDateInToday(date),
+                                isCurrentMonth: calendar.isDate(date, equalTo: displayedMonth, toGranularity: .month),
+                                hasEvents: checkHasEvents(for: date)
+                            )
                         }
+                        .buttonStyle(.plain)
                     } else {
                         Color.clear
-                            .frame(height: 40)
+                            .frame(height: 48)
                     }
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.bottom, 16)
         }
     }
-    
-    // MARK: - Content Below Calendar
+
     private var calendarContentBelow: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 12) {
+            PremiumSectionTitle(title: "Selected day", trailing: "\(viewModel.slots.count) slots")
+
             if viewModel.isLoading && viewModel.slots.isEmpty {
-                Spacer().frame(height: 40)
                 ProgressView()
                     .tint(.iosBlue)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
             } else if viewModel.slots.isEmpty {
-                Spacer().frame(height: 24)
                 compactEmptyState
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(viewModel.slots) { slot in
-                            if slot.type == .free {
-                                FreeSlotCard(slot: slot)
-                            } else {
-                                BusySlotCard(slot: slot) {
-                                    if let event = slot.associatedEvent {
-                                        selectedEventDetail = event
-                                    }
+                LazyVStack(spacing: 12) {
+                    ForEach(viewModel.slots) { slot in
+                        if slot.type == .free {
+                            FreeSlotCard(slot: slot)
+                        } else {
+                            BusySlotCard(slot: slot) {
+                                if let event = slot.associatedEvent {
+                                    selectedEventDetail = event
                                 }
                             }
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 16)
-                    .padding(.bottom, 24)
                 }
-                .refreshable {
-                    viewModel.loadEvents()
-                }
-                
-                Divider()
-                    .background(Color.separator)
-                
+
                 SummaryView(schedule: viewModel.daySchedule)
-                    .padding(.vertical, 12)
-                    .background(Color.systemBackground)
             }
-            
-            Spacer()
         }
     }
-    
-    // MARK: - Compact Empty State
+
     private var compactEmptyState: some View {
         VStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(Color.freeColor.opacity(0.08))
-                    .frame(width: 64, height: 64)
-                
+                    .fill(AppStyle.freeGradient)
+                    .frame(width: 68, height: 68)
+                    .shadow(color: Color.freeColor.opacity(0.22), radius: 14, x: 0, y: 8)
+
                 Image(systemName: "sparkles")
-                    .font(.system(size: 24))
-                    .foregroundColor(.freeColor)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
             }
-            
+
             Text("No appointments this day")
-                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .foregroundColor(.primaryText)
+
+            Text("Your working window is fully open.")
+                .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundColor(.secondaryText)
         }
-        .padding(.top, 20)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 28)
+        .premiumCard(cornerRadius: 22, shadowRadius: 12)
     }
-    
-    // MARK: - Helpers
+
     private var dayHeaders: [String] {
         ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     }
-    
+
     private func shiftMonth(_ delta: Int) {
         withAnimation(.easeInOut(duration: 0.25)) {
             displayedMonth = calendar.date(byAdding: .month, value: delta, to: displayedMonth) ?? displayedMonth
         }
     }
-    
+
     private func daysInMonth() -> [Date?] {
         let range = calendar.range(of: .day, in: .month, for: displayedMonth)!
         let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: displayedMonth))!
         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
-        
         let offset = (firstWeekday + 5) % 7
-        
+
         var days: [Date?] = Array(repeating: nil, count: offset)
-        
+
         for day in range {
             if let date = calendar.date(byAdding: .day, value: day - 1, to: firstDayOfMonth) {
                 days.append(date)
             }
         }
-        
+
         return days
     }
-    
+
     private func checkHasEvents(for date: Date) -> Bool {
         viewModel.monthEventStartDates.contains(calendar.startOfDay(for: date))
     }
 }
 
-// MARK: - Enhanced Day Cell
 struct EnhancedDayCell: View {
     let date: Date
     let isSelected: Bool
     let isToday: Bool
     let isCurrentMonth: Bool
     let hasEvents: Bool
-    
+
     private let calendar = Calendar.current
-    
+
     var body: some View {
         VStack(spacing: 4) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(isSelected ? Color.iosBlue : Color.clear)
-                    .frame(width: 36, height: 36)
-                
-                if isToday && !isSelected {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.iosBlue.opacity(0.4), lineWidth: 1.5)
-                        .frame(width: 36, height: 36)
-                }
-                
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(isSelected ? AnyShapeStyle(AppStyle.accentGradient) : AnyShapeStyle(Color.softFill.opacity(isToday ? 1 : 0)))
+                    .frame(height: 38)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(isToday && !isSelected ? Color.iosBlue.opacity(0.35) : Color.clear, lineWidth: 1.5)
+                    )
+
                 Text("\(calendar.component(.day, from: date))")
-                    .font(.system(size: 15, weight: isSelected ? .bold : (isToday ? .semibold : .regular), design: .rounded))
+                    .font(.system(size: 15, weight: isSelected || isToday ? .bold : .semibold, design: .rounded))
                     .foregroundColor(
                         isSelected ? .white :
                         isToday ? .iosBlue :
                         isCurrentMonth ? .primaryText : .secondaryText.opacity(0.35)
                     )
             }
-            
-            if hasEvents && !isSelected {
-                Circle()
-                    .fill(Color.iosBlue.opacity(0.6))
-                    .frame(width: 4, height: 4)
-            } else {
-                Spacer().frame(height: 4)
-            }
+
+            Circle()
+                .fill(hasEvents && !isSelected ? Color.iosBlue.opacity(0.72) : Color.clear)
+                .frame(width: 4, height: 4)
         }
-        .frame(height: 46)
+        .frame(height: 48)
         .contentShape(Rectangle())
     }
 }

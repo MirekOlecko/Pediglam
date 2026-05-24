@@ -5,102 +5,27 @@ struct EventDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    // Header Card
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("KLIENT")
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                            .foregroundColor(.busyColor)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(Color.busyColor.opacity(0.12))
-                            .cornerRadius(6)
-                        
-                        // Client name (cleaned — without embedded time)
-                        Text(event.clientName)
-                            .font(.system(size: 26, weight: .bold, design: .rounded))
-                            .foregroundColor(.primaryText)
-                            .fixedSize(horizontal: false, vertical: true)
-                        
-                        // Service description if present (e.g. "rece manicure, nogi")
-                        if let service = event.serviceNote, !service.isEmpty {
-                            HStack(spacing: 6) {
-                                Image(systemName: "scissors")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.busyColor.opacity(0.7))
-                                Text(service)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.busyColor.opacity(0.85))
-                            }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color.busyColor.opacity(0.08))
-                            .cornerRadius(8)
+        NavigationStack {
+            ZStack {
+                PremiumBackground()
+
+                ScrollView {
+                    VStack(spacing: 16) {
+                        headerCard
+                        detailsCard
+
+                        if let notes = event.notes, !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            notesCard(notes)
                         }
+
+                        openCalendarButton
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 10)
-                    
-                    // Detail Blocks
-                    VStack(spacing: 1) {
-                        detailRow(icon: "calendar", title: "Date", value: event.startDate.formattedPolishHeader())
-                        detailRow(icon: "clock", title: "Time", value: "\(event.startDate.formattedTime()) – \(event.endDate.formattedTime())")
-                        detailRow(icon: "timer", title: "Duration", value: event.duration.formattedDuration())
-                        
-                        if let location = event.location, !location.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            detailRow(icon: "mappin.and.ellipse", title: "Location", value: location)
-                        }
-                    }
-                    .background(Color.cardBackground)
-                    .cornerRadius(16)
-                    .padding(.horizontal)
-                    
-                    // Notes Section
-                    if let notes = event.notes, !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Notes")
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
-                                .foregroundColor(.secondaryText)
-                                .padding(.horizontal)
-                            
-                            Text(notes)
-                                .font(.system(size: 15))
-                                .foregroundColor(.primaryText)
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.cardBackground)
-                                .cornerRadius(16)
-                                .padding(.horizontal)
-                        }
-                    }
-                    
-                    Spacer(minLength: 40)
-                    
-                    // Open in Calendar Button
-                    Button(action: {
-                        let interval = event.startDate.timeIntervalSinceReferenceDate
-                        if let url = URL(string: "calshow:\(interval)") {
-                            UIApplication.shared.open(url)
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: "calendar")
-                            Text("Open in Calendar")
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.iosBlue)
-                        .cornerRadius(14)
-                        .shadow(color: Color.iosBlue.opacity(0.2), radius: 8, x: 0, y: 4)
-                        .padding(.horizontal)
-                    }
+                    .padding(.horizontal, AppStyle.horizontalPadding)
+                    .padding(.top, 14)
+                    .padding(.bottom, 28)
                 }
+                .scrollIndicators(.hidden)
             }
-            .background(Color.systemBackground)
             .navigationTitle("Appointment Details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -114,27 +39,125 @@ struct EventDetailSheet: View {
             }
         }
     }
+
+    private var headerCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 14) {
+                Text(String(event.clientName.prefix(1).uppercased()))
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .frame(width: 58, height: 58)
+                    .background(AppStyle.busyGradient)
+                    .clipShape(Circle())
+                    .shadow(color: Color.busyColor.opacity(0.22), radius: 12, x: 0, y: 7)
+
+                VStack(alignment: .leading, spacing: 7) {
+                    Text("CLIENT")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(.busyColor)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.busyColor.opacity(0.12))
+                        .clipShape(.rect(cornerRadius: 8, style: .continuous))
+
+                    Text(event.clientName)
+                        .font(.system(size: 27, weight: .bold, design: .rounded))
+                        .foregroundColor(.primaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            if let service = event.serviceNote, !service.isEmpty {
+                HStack(spacing: 7) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 12, weight: .bold))
+
+                    Text(service)
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .lineLimit(2)
+                }
+                .foregroundColor(.busyColor)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.busyColor.opacity(0.09))
+                .clipShape(.rect(cornerRadius: 12, style: .continuous))
+            }
+        }
+        .padding(18)
+        .premiumCard(cornerRadius: 26, shadowRadius: 18)
+    }
+
+    private var detailsCard: some View {
+        PremiumSettingsSection(title: "Details") {
+            VStack(spacing: 0) {
+                detailRow(icon: "calendar", title: "Date", value: event.startDate.formattedPolishHeader(), color: .iosBlue)
+                PremiumRowDivider()
+                detailRow(icon: "clock.fill", title: "Time", value: "\(event.startDate.formattedTime()) – \(event.endDate.formattedTime())", color: .premiumGold)
+                PremiumRowDivider()
+                detailRow(icon: "timer", title: "Duration", value: event.duration.formattedDuration(), color: .freeColor)
+
+                if let location = event.location, !location.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    PremiumRowDivider()
+                    detailRow(icon: "mappin.and.ellipse", title: "Location", value: location, color: .busyColor)
+                }
+            }
+        }
+    }
+
+    private func notesCard(_ notes: String) -> some View {
+        PremiumSettingsSection(title: "Notes") {
+            Text(notes)
+                .font(.system(size: 15, weight: .medium, design: .rounded))
+                .foregroundColor(.primaryText)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+        }
+    }
+
+    private var openCalendarButton: some View {
+        Button {
+            let interval = event.startDate.timeIntervalSinceReferenceDate
+            if let url = URL(string: "calshow:\(interval)") {
+                UIApplication.shared.open(url)
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "calendar")
+                    .font(.system(size: 15, weight: .bold))
+
+                Text("Open in Calendar")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 15)
+            .background(AppStyle.accentGradient)
+            .clipShape(.rect(cornerRadius: AppStyle.controlRadius, style: .continuous))
+            .shadow(color: Color.iosBlue.opacity(0.25), radius: 12, x: 0, y: 7)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 4)
+    }
     
-    private func detailRow(icon: String, title: String, value: String) -> some View {
+    private func detailRow(icon: String, title: String, value: String, color: Color) -> some View {
         HStack(spacing: 14) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundColor(.secondaryText)
-                .frame(width: 24)
+            SettingsRowIcon(systemName: icon, color: color)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
                     .foregroundColor(.secondaryText)
                 
                 Text(value)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundColor(.primaryText)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             
             Spacer()
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(14)
     }
 }

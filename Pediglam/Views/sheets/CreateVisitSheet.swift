@@ -26,64 +26,23 @@ struct CreateVisitSheet: View {
     
     var body: some View {
         NavigationStack {
-            Form {
-                // Client info
-                Section("Client") {
-                    TextField("Client name", text: $clientName)
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
-                    
-                    TextField("Service note (optional)", text: $serviceNote)
-                        .font(.system(size: 14))
-                        .foregroundColor(.secondaryText)
-                }
-                
-                // Date
-                Section("Date") {
-                    DatePicker("Date", selection: $selectedDate, displayedComponents: [.date])
-                        .datePickerStyle(.graphical)
-                        .tint(.iosBlue)
-                }
-                
-                // Time
-                Section("Time") {
-                    DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
-                        .tint(.iosBlue)
-                    
-                    DatePicker("End", selection: $endTime, displayedComponents: .hourAndMinute)
-                        .tint(.iosBlue)
-                }
-                
-                // Preview
-                Section {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(clientName.isEmpty ? "Client name" : clientName)
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                .foregroundColor(clientName.isEmpty ? .secondaryText : .primaryText)
-                            
-                            if !serviceNote.isEmpty {
-                                Text(serviceNote)
-                                    .font(.system(size: 13))
-                                    .foregroundColor(.secondaryText)
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        VStack(alignment: .trailing, spacing: 4) {
-                            Text("\(startTime.formattedTime()) – \(endTime.formattedTime())")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.primaryText)
-                            
-                            Text(durationString)
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondaryText)
-                        }
+            ZStack {
+                PremiumBackground()
+
+                ScrollView {
+                    VStack(spacing: 16) {
+                        sheetIntro
+                        clientSection
+                        dateSection
+                        timeSection
+                        previewSection
+                        saveButton
                     }
-                    .padding(.vertical, 4)
-                } header: {
-                    Text("Preview")
+                    .padding(.horizontal, AppStyle.horizontalPadding)
+                    .padding(.top, 14)
+                    .padding(.bottom, 28)
                 }
+                .scrollIndicators(.hidden)
             }
             .navigationTitle("New Visit")
             .navigationBarTitleDisplayMode(.inline)
@@ -95,35 +54,170 @@ struct CreateVisitSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        let cal = Calendar.current
-                        let startComp = cal.dateComponents([.hour, .minute], from: startTime)
-                        let endComp = cal.dateComponents([.hour, .minute], from: endTime)
-                        
-                        let success = viewModel.createVisit(
-                            clientName: clientName.isEmpty ? "Client" : clientName,
-                            date: selectedDate,
-                            startHour: startComp.hour ?? 9,
-                            startMinute: startComp.minute ?? 0,
-                            endHour: endComp.hour ?? 10,
-                            endMinute: endComp.minute ?? 0,
-                            serviceNote: serviceNote.isEmpty ? nil : serviceNote
-                        )
-                        
-                        if success {
-                            dismiss()
-                        } else if let error = viewModel.error {
-                            conflictMessage = error
-                            showConflictAlert = true
-                        }
-                    }
-                    .fontWeight(.semibold)
-                    .disabled(clientName.trimmingCharacters(in: .whitespaces).isEmpty)
+                        .foregroundColor(.secondaryText)
                 }
             }
         }
+    }
+
+    private var sheetIntro: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(AppStyle.busyGradient)
+                    .frame(width: 52, height: 52)
+                    .shadow(color: Color.busyColor.opacity(0.22), radius: 12, x: 0, y: 7)
+
+                Image(systemName: "calendar.badge.plus")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.white)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Book a visit")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.primaryText)
+
+                Text("Create a clean calendar appointment")
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundColor(.secondaryText)
+            }
+
+            Spacer()
+        }
+        .padding(18)
+        .premiumCard(cornerRadius: 24, shadowRadius: 16)
+    }
+
+    private var clientSection: some View {
+        PremiumSettingsSection(title: "Client") {
+            VStack(spacing: 0) {
+                HStack(spacing: 12) {
+                    SettingsRowIcon(systemName: "person.fill", color: .iosBlue)
+
+                    TextField("Client name", text: $clientName)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundColor(.primaryText)
+                        .textInputAutocapitalization(.words)
+                }
+                .padding(14)
+
+                PremiumRowDivider()
+
+                HStack(spacing: 12) {
+                    SettingsRowIcon(systemName: "sparkles", color: .premiumGold)
+
+                    TextField("Service note (optional)", text: $serviceNote)
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                        .foregroundColor(.primaryText)
+                }
+                .padding(14)
+            }
+        }
+    }
+
+    private var dateSection: some View {
+        PremiumSettingsSection(title: "Date") {
+            DatePicker("Date", selection: $selectedDate, displayedComponents: [.date])
+                .datePickerStyle(.graphical)
+                .labelsHidden()
+                .tint(.iosBlue)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+        }
+    }
+
+    private var timeSection: some View {
+        PremiumSettingsSection(title: "Time") {
+            VStack(spacing: 0) {
+                HStack(spacing: 12) {
+                    SettingsRowIcon(systemName: "clock.fill", color: .freeColor)
+
+                    DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundColor(.primaryText)
+                        .tint(.iosBlue)
+                }
+                .padding(14)
+
+                PremiumRowDivider()
+
+                HStack(spacing: 12) {
+                    SettingsRowIcon(systemName: "timer", color: .busyColor)
+
+                    DatePicker("End", selection: $endTime, displayedComponents: .hourAndMinute)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundColor(.primaryText)
+                        .tint(.iosBlue)
+                }
+                .padding(14)
+            }
+        }
+    }
+
+    private var previewSection: some View {
+        PremiumSettingsSection(title: "Preview", trailing: durationString) {
+            HStack(spacing: 12) {
+                Text(String((clientName.isEmpty ? "C" : clientName).prefix(1)).uppercased())
+                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .frame(width: 42, height: 42)
+                    .background(AppStyle.busyGradient)
+                    .clipShape(Circle())
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(clientName.isEmpty ? "Client name" : clientName)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundColor(clientName.isEmpty ? .secondaryText : .primaryText)
+                        .lineLimit(1)
+
+                    Text(serviceNote.isEmpty ? "No service note" : serviceNote)
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundColor(.secondaryText)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("\(startTime.formattedTime()) – \(endTime.formattedTime())")
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundColor(.primaryText)
+
+                    Text(selectedDate.formattedShortDate())
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundColor(.secondaryText)
+                }
+            }
+            .padding(14)
+        }
+    }
+
+    private var saveButton: some View {
+        Button {
+            saveVisit()
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 14, weight: .bold))
+
+                Text("Save visit")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 15)
+            .background(canSave ? AnyShapeStyle(AppStyle.accentGradient) : AnyShapeStyle(Color.secondaryText.opacity(0.24)))
+            .clipShape(.rect(cornerRadius: AppStyle.controlRadius, style: .continuous))
+            .shadow(color: canSave ? Color.iosBlue.opacity(0.25) : .clear, radius: 12, x: 0, y: 7)
+        }
+        .buttonStyle(.plain)
+        .disabled(!canSave)
+        .padding(.top, 4)
+    }
+
+    private var canSave: Bool {
+        !clientName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
     private var durationString: String {
@@ -139,6 +233,31 @@ struct CreateVisitSheet: View {
             let h = diff / 60
             let m = diff % 60
             return m == 0 ? "\(h)h" : "\(h)h \(m)min"
+        }
+    }
+
+    private func saveVisit() {
+        guard canSave else { return }
+
+        let cal = Calendar.current
+        let startComp = cal.dateComponents([.hour, .minute], from: startTime)
+        let endComp = cal.dateComponents([.hour, .minute], from: endTime)
+
+        let success = viewModel.createVisit(
+            clientName: clientName.trimmingCharacters(in: .whitespacesAndNewlines),
+            date: selectedDate,
+            startHour: startComp.hour ?? 9,
+            startMinute: startComp.minute ?? 0,
+            endHour: endComp.hour ?? 10,
+            endMinute: endComp.minute ?? 0,
+            serviceNote: serviceNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : serviceNote.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+
+        if success {
+            dismiss()
+        } else if let error = viewModel.error {
+            conflictMessage = error
+            showConflictAlert = true
         }
     }
 }

@@ -11,18 +11,16 @@ struct EventCard<Content: View>: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            // Thin accent bar — 3px like iOS Calendar
             RoundedRectangle(cornerRadius: 1.5)
                 .fill(accentColor)
-                .frame(width: 3)
-                .padding(.vertical, 6)
-                .padding(.leading, 12)
+                .frame(width: 4)
+                .padding(.vertical, 12)
+                .padding(.leading, 14)
             
             content
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 14)
         }
-        .background(Color.cardBackground)
-        .cornerRadius(10)
+        .premiumCard(cornerRadius: 18, shadowRadius: 12)
     }
 }

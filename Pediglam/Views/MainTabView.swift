@@ -48,7 +48,7 @@ struct MainTabView: View {
     // MARK: - Permission Request Gate
     private var permissionGate: some View {
         ZStack {
-            Color.systemBackground.ignoresSafeArea()
+            PremiumBackground()
             
             VStack(spacing: 24) {
                 Spacer()
@@ -56,15 +56,23 @@ struct MainTabView: View {
                 Image("AlicjaLogo")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 160, height: 160)
+                    .frame(width: 142, height: 142)
+                    .padding(20)
+                    .background(Color.elevatedCardBackground)
+                    .clipShape(.rect(cornerRadius: 34, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 34, style: .continuous)
+                            .stroke(Color.premiumStroke, lineWidth: 1)
+                    )
+                    .shadow(color: Color.premiumShadow, radius: 24, x: 0, y: 14)
                 
                 VStack(spacing: 12) {
                     Text("Welcome to Pediglam")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundColor(.primaryText)
                     
                     Text("A minimalist app for managing your free time slots. See available gaps in your workday in seconds.")
-                        .font(.system(size: 15))
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundColor(.secondaryText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 36)
@@ -73,15 +81,21 @@ struct MainTabView: View {
                 Button(action: {
                     viewModel.requestAccess()
                 }) {
-                    Text("Allow Calendar Access")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.iosBlue)
-                        .cornerRadius(14)
-                        .shadow(color: Color.iosBlue.opacity(0.2), radius: 8, x: 0, y: 4)
+                    HStack(spacing: 8) {
+                        Image(systemName: "calendar.badge.checkmark")
+                            .font(.system(size: 15, weight: .bold))
+
+                        Text("Allow Calendar Access")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                    }
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(AppStyle.accentGradient)
+                    .clipShape(.rect(cornerRadius: AppStyle.controlRadius, style: .continuous))
+                    .shadow(color: Color.iosBlue.opacity(0.25), radius: 12, x: 0, y: 7)
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal, 36)
                 .padding(.top, 16)
                 
@@ -95,28 +109,29 @@ struct MainTabView: View {
     // MARK: - Permission Denied Gate
     private var permissionDeniedGate: some View {
         ZStack {
-            Color.systemBackground.ignoresSafeArea()
+            PremiumBackground()
             
             VStack(spacing: 24) {
                 Spacer()
                 
                 ZStack {
                     Circle()
-                        .fill(Color.busyColor.opacity(0.1))
+                        .fill(AppStyle.busyGradient)
                         .frame(width: 140, height: 140)
+                        .shadow(color: Color.busyColor.opacity(0.24), radius: 18, x: 0, y: 10)
                     
                     Image(systemName: "calendar.badge.exclamationmark")
-                        .font(.system(size: 60))
-                        .foregroundColor(.busyColor)
+                        .font(.system(size: 58, weight: .bold))
+                        .foregroundColor(.white)
                 }
                 
                 VStack(spacing: 12) {
                     Text("Calendar Access Denied")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundColor(.primaryText)
                     
                     Text("Pediglam needs access to your system calendar to display today's appointments and automatically calculate free time.")
-                        .font(.system(size: 15))
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundColor(.secondaryText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 36)
@@ -127,15 +142,21 @@ struct MainTabView: View {
                         UIApplication.shared.open(url)
                     }
                 }) {
-                    Text("Open Settings")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.iosBlue)
-                        .cornerRadius(14)
-                        .shadow(color: Color.iosBlue.opacity(0.2), radius: 8, x: 0, y: 4)
+                    HStack(spacing: 8) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 15, weight: .bold))
+
+                        Text("Open Settings")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                    }
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(AppStyle.accentGradient)
+                    .clipShape(.rect(cornerRadius: AppStyle.controlRadius, style: .continuous))
+                    .shadow(color: Color.iosBlue.opacity(0.25), radius: 12, x: 0, y: 7)
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal, 36)
                 .padding(.top, 16)
                 

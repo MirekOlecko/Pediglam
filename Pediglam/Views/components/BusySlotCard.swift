@@ -9,22 +9,21 @@ struct BusySlotCard: View {
     var body: some View {
         Button(action: onTap) {
             EventCard(accentColor: .busyColor) {
-                HStack(spacing: 10) {
-                    // Colored dot with initial — like iOS Calendar
+                HStack(spacing: 12) {
                     ZStack {
                         Circle()
-                            .fill(Color.busyColor.opacity(0.15))
-                            .frame(width: 32, height: 32)
+                            .fill(AppStyle.busyGradient)
+                            .frame(width: 38, height: 38)
+                            .shadow(color: Color.busyColor.opacity(0.22), radius: 8, x: 0, y: 5)
 
                         Text(String(slot.title.prefix(1).uppercased()))
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                            .foregroundColor(.busyColor)
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
                     }
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        // slot.title already contains merged names ("A, B") for overlapping events
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(slot.title)
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
                             .foregroundColor(.primaryText)
                             .lineLimit(1)
 
@@ -38,14 +37,14 @@ struct BusySlotCard: View {
                     
                     Spacer()
                     
-                    VStack(alignment: .trailing, spacing: 2) {
+                    VStack(alignment: .trailing, spacing: 4) {
                         Text("\(slot.startDate.formattedTime()) – \(slot.endDate.formattedTime())")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.secondaryText)
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .foregroundColor(.primaryText)
                         
                         Text(slot.duration.formattedDuration())
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondaryText.opacity(0.7))
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundColor(.secondaryText)
                     }
                     
                     Image(systemName: "chevron.right")

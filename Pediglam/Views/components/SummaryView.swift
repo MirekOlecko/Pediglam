@@ -4,18 +4,35 @@ struct SummaryView: View {
     let schedule: DaySchedule
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Image(systemName: "chart.bar.fill")
-                    .foregroundColor(.iosBlue)
-                    .font(.system(size: 16))
-                
-                Text("Day Summary")
-                    .font(.system(size: 17, weight: .bold, design: .rounded))
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(AppStyle.accentGradient)
+                        .frame(width: 38, height: 38)
+
+                    Image(systemName: "chart.bar.fill")
+                        .foregroundColor(.white)
+                        .font(.system(size: 15, weight: .bold))
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Day Summary")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.primaryText)
+
+                    Text("Free vs booked time")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundColor(.secondaryText)
+                }
+
+                Spacer()
+
+                Text(String(format: "%.0f%%", schedule.occupancyRate * 100))
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundColor(.primaryText)
             }
             
-            // Custom visual progress gauge split
             GeometryReader { geo in
                 HStack(spacing: 0) {
                     let total = schedule.totalWorkTime
@@ -39,54 +56,37 @@ struct SummaryView: View {
                             .frame(width: geo.size.width)
                     }
                 }
-                .cornerRadius(6)
+                .clipShape(.rect(cornerRadius: 6, style: .continuous))
             }
-            .frame(height: 8)
+            .frame(height: 10)
             .padding(.vertical, 2)
             
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("FREE")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundColor(.secondaryText)
-                    
-                    Text(schedule.totalFreeTime.formattedDuration())
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(.freeColor)
-                }
-                
+                SummaryMetric(title: "Free", value: schedule.totalFreeTime.formattedDuration(), color: .freeColor)
                 Spacer()
-                
-                // Show utilization percentage in the middle
-                if schedule.totalWorkTime > 0 {
-                    VStack(alignment: .center, spacing: 4) {
-                        Text("OCCUPANCY")
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                            .foregroundColor(.secondaryText)
-                        
-                        Text(String(format: "%.0f%%", schedule.occupancyRate * 100))
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(.primaryText)
-                    }
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("BUSY")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundColor(.secondaryText)
-                    
-                    Text(schedule.totalBusyTime.formattedDuration())
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(.busyColor)
-                }
+                SummaryMetric(title: "Busy", value: schedule.totalBusyTime.formattedDuration(), color: .busyColor, alignment: .trailing)
             }
         }
-        .padding(16)
-        .background(Color.cardBackground)
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.02), radius: 8, x: 0, y: 4)
-        .padding(.horizontal)
+        .padding(18)
+        .premiumCard(cornerRadius: 24, shadowRadius: 18)
+    }
+}
+
+private struct SummaryMetric: View {
+    let title: String
+    let value: String
+    let color: Color
+    var alignment: HorizontalAlignment = .leading
+
+    var body: some View {
+        VStack(alignment: alignment, spacing: 4) {
+            Text(title.uppercased())
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .foregroundColor(.secondaryText)
+
+            Text(value)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundColor(color)
+        }
     }
 }

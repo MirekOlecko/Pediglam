@@ -10,21 +10,35 @@ struct SplashScreen: View {
 
     var body: some View {
         ZStack {
-            (isDark ? Color.black : Color.white).ignoresSafeArea()
+            PremiumBackground()
 
-            Group {
-                if isDark {
-                    Image("AlicjaLogo")
-                        .resizable()
-                        .scaledToFit()
-                        .colorInvert()
-                } else {
-                    Image("AlicjaLogo")
-                        .resizable()
-                        .scaledToFit()
+            VStack(spacing: 18) {
+                Group {
+                    if isDark {
+                        Image("AlicjaLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .colorInvert()
+                    } else {
+                        Image("AlicjaLogo")
+                            .resizable()
+                            .scaledToFit()
+                    }
                 }
+                .frame(width: 210, height: 210)
+                .padding(24)
+                .background(Color.elevatedCardBackground)
+                .clipShape(.rect(cornerRadius: 38, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 38, style: .continuous)
+                        .stroke(Color.premiumStroke, lineWidth: 1)
+                )
+                .shadow(color: Color.premiumShadow, radius: 28, x: 0, y: 16)
+
+                Text("Pediglam")
+                    .font(.system(size: 25, weight: .bold, design: .rounded))
+                    .foregroundColor(.primaryText)
             }
-            .frame(width: 260, height: 260)
             .scaleEffect(scale)
             .opacity(opacity)
         }
