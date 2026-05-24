@@ -180,6 +180,10 @@ struct DashboardView: View {
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.primaryText)
                         
+                        Text(event.startDate.formattedShortDate())
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondaryText.opacity(0.7))
+                        
                         Text(event.duration.formattedDuration())
                             .font(.system(size: 11))
                             .foregroundColor(.secondaryText)

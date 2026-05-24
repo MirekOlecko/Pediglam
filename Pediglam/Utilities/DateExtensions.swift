@@ -17,6 +17,13 @@ extension Date {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: self)
     }
+    
+    func formattedShortDate() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "d MMM"
+        return formatter.string(from: self)
+    }
 }
 
 extension TimeInterval {
