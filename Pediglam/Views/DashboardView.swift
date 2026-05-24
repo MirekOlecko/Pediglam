@@ -5,7 +5,10 @@ struct DashboardView: View {
     @State private var selectedEventDetail: CalendarEvent? = nil
     
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack {
+            Color.systemBackground.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
             // Header
             HStack {
                 Text("Dashboard")
@@ -56,6 +59,7 @@ struct DashboardView: View {
                     .padding(.bottom, 24)
                 }
             }
+            }
         }
         .onAppear {
             viewModel.loadDashboardEvents()
@@ -102,7 +106,7 @@ struct DashboardView: View {
     
     // MARK: - Stats Grid
     private var statsGrid: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
             StatCard(
                 title: "Visits",
                 value: "\(viewModel.dashboardStats.totalVisits)",
@@ -231,29 +235,30 @@ struct StatCard: View {
     let color: Color
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .center, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(color)
                 
                 Text(title)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.secondaryText)
                     .textCase(.uppercase)
             }
             
             Text(value)
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundColor(.primaryText)
+                .minimumScaleFactor(0.7)
             
             Text(subtitle)
-                .font(.system(size: 12))
+                .font(.system(size: 11))
                 .foregroundColor(.secondaryText)
         }
-        .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
-        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 90, alignment: .leading)
+        .padding(12)
         .background(Color.cardBackground)
-        .cornerRadius(14)
+        .cornerRadius(12)
     }
 }
