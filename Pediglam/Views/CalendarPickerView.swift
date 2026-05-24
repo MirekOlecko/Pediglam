@@ -53,6 +53,7 @@ struct CalendarPickerView: View {
         .onAppear {
             displayedMonth = viewModel.selectedDate
             viewModel.loadEvents()
+            viewModel.loadMonthEvents(month: viewModel.selectedDate)
         }
         .onChange(of: viewModel.selectedDate) { newDate in
             if !calendar.isDate(newDate, inSameDayAs: displayedMonth) {
@@ -60,6 +61,9 @@ struct CalendarPickerView: View {
                     displayedMonth = newDate
                 }
             }
+        }
+        .onChange(of: displayedMonth) { newMonth in
+            viewModel.loadMonthEvents(month: newMonth)
         }
     }
     
@@ -341,7 +345,7 @@ struct CalendarPickerView: View {
     }
     
     private func checkHasEvents(for date: Date) -> Bool {
-        return calendar.isDateInToday(date)
+        viewModel.monthEventStartDates.contains(calendar.startOfDay(for: date))
     }
 }
 

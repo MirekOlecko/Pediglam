@@ -4,22 +4,37 @@ import EventKit
 
 class CalendarViewModel: ObservableObject {
     private let calendarService = CalendarService()
-    
+
     @Published var slots: [TimeSlot] = []
     @Published var isLoading = false
     @Published var error: String? = nil
     @Published var authorizationStatus: EKAuthorizationStatus = .notDetermined
+    @Published var monthEventStartDates: Set<Date> = []
+
     @Published var selectedDate = Date() {
         didSet {
             loadEvents()
         }
     }
-    
-    // Settings backed by UserDefaults with published notifications
+
+    // True when the user has granted calendar access (handles both iOS 16 .authorized and iOS 17+ .fullAccess)
+    private var isAuthorized: Bool {
+        if #available(iOS 17.0, *) {
+            return authorizationStatus == .fullAccess
+        }
+        return authorizationStatus == .authorized
+    }
+
+    // Generation counters for cancelling stale background fetches
+    private var loadEventsGeneration = 0
+    private var loadDashboardGeneration = 0
+
+    // MARK: - Settings backed by UserDefaults
+
     var workStartHour: Int {
         get {
-            let val = UserDefaults.standard.integer(forKey: "workStartHour")
-            return val == 0 ? 9 : val
+            if UserDefaults.standard.object(forKey: "workStartHour") == nil { return 9 }
+            return UserDefaults.standard.integer(forKey: "workStartHour")
         }
         set {
             UserDefaults.standard.set(newValue, forKey: "workStartHour")
@@ -27,7 +42,7 @@ class CalendarViewModel: ObservableObject {
             loadEvents()
         }
     }
-    
+
     var workStartMinute: Int {
         get {
             UserDefaults.standard.integer(forKey: "workStartMinute")
@@ -38,11 +53,11 @@ class CalendarViewModel: ObservableObject {
             loadEvents()
         }
     }
-    
+
     var workEndHour: Int {
         get {
-            let val = UserDefaults.standard.integer(forKey: "workEndHour")
-            return val == 0 ? 19 : val
+            if UserDefaults.standard.object(forKey: "workEndHour") == nil { return 19 }
+            return UserDefaults.standard.integer(forKey: "workEndHour")
         }
         set {
             UserDefaults.standard.set(newValue, forKey: "workEndHour")
@@ -50,7 +65,7 @@ class CalendarViewModel: ObservableObject {
             loadEvents()
         }
     }
-    
+
     var workEndMinute: Int {
         get {
             UserDefaults.standard.integer(forKey: "workEndMinute")
@@ -61,7 +76,7 @@ class CalendarViewModel: ObservableObject {
             loadEvents()
         }
     }
-    
+
     var filterNoTitleEvents: Bool {
         get {
             UserDefaults.standard.bool(forKey: "filterNoTitleEvents")
@@ -72,16 +87,16 @@ class CalendarViewModel: ObservableObject {
             loadEvents()
         }
     }
-    
+
     // MARK: - Dashboard Stats
-    
+
     enum DashboardRange: String, CaseIterable {
         case day = "Day"
         case week = "Week"
         case month = "Month"
         case year = "Year"
     }
-    
+
     @Published var dashboardRange: DashboardRange = .week {
         didSet {
             UserDefaults.standard.set(dashboardRange.rawValue, forKey: "dashboardRange")
@@ -89,7 +104,7 @@ class CalendarViewModel: ObservableObject {
     }
     @Published var dashboardEvents: [CalendarEvent] = []
     @Published var dashboardIsLoading = false
-    
+
     struct DashboardStats {
         let totalVisits: Int
         let uniqueClients: Int
@@ -98,15 +113,15 @@ class CalendarViewModel: ObservableObject {
         let occupancyRate: Double
         let rangeLabel: String
     }
-    
+
     var daySchedule: DaySchedule {
         DaySchedule(date: selectedDate, slots: slots)
     }
-    
+
     var dashboardStats: DashboardStats {
         let calendar = Calendar.current
         let now = Date()
-        
+
         let (rangeStart, rangeEnd): (Date, Date) = {
             switch dashboardRange {
             case .day:
@@ -128,26 +143,45 @@ class CalendarViewModel: ObservableObject {
                         calendar.date(byAdding: DateComponents(year: 1, second: -1), to: startOfYear)!)
             }
         }()
-        
-        let busyMinutes = dashboardEvents.reduce(0) { acc, event in
-            let start = max(event.startDate, rangeStart)
-            let end = min(event.endDate, rangeEnd)
-            return acc + Int(max(0, end.timeIntervalSince(start)) / 60)
+
+        // Clip each event to both the date range AND the daily work hours window
+        let busyMinutes = dashboardEvents.reduce(0) { total, event in
+            let eventStart = max(event.startDate, rangeStart)
+            let eventEnd = min(event.endDate, rangeEnd)
+            guard eventStart < eventEnd else { return total }
+
+            var minutes = 0
+            var day = calendar.startOfDay(for: eventStart)
+            let lastDay = calendar.startOfDay(for: eventEnd)
+            while day <= lastDay {
+                if let workStart = calendar.date(bySettingHour: workStartHour, minute: workStartMinute, second: 0, of: day),
+                   let workEnd = calendar.date(bySettingHour: workEndHour, minute: workEndMinute, second: 0, of: day) {
+                    let overlapStart = max(eventStart, workStart)
+                    let overlapEnd = min(eventEnd, workEnd)
+                    if overlapStart < overlapEnd {
+                        minutes += Int(overlapEnd.timeIntervalSince(overlapStart) / 60)
+                    }
+                }
+                guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
+                day = next
+            }
+            return total + minutes
         }
-        
+
         let workingDays: Int = {
             let days = calendar.dateComponents([.day], from: rangeStart, to: rangeEnd).day ?? 0
             return days + 1
         }()
-        let workMinutesPerDay = (workEndHour - workStartHour) * 60
+        // Include minutes in work day length (e.g. 9:30–18:30 = 540 min, not 9*60)
+        let workMinutesPerDay = (workEndHour * 60 + workEndMinute) - (workStartHour * 60 + workStartMinute)
         let totalWorkMinutes = workingDays * workMinutesPerDay
         let freeMinutes = max(0, totalWorkMinutes - busyMinutes)
-        
+
         let clients = Set(dashboardEvents.map { $0.clientName })
-        
+
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMM"
-        
+
         return DashboardStats(
             totalVisits: dashboardEvents.count,
             uniqueClients: clients.count,
@@ -157,15 +191,18 @@ class CalendarViewModel: ObservableObject {
             rangeLabel: "\(formatter.string(from: rangeStart)) – \(formatter.string(from: rangeEnd))"
         )
     }
-    
+
     func loadDashboardEvents() {
-        guard authorizationStatus == .authorized else { return }
-        
+        authorizationStatus = calendarService.checkAuthorizationStatus()
+        guard isAuthorized else { return }
+
         dashboardIsLoading = true
-        
+        loadDashboardGeneration += 1
+        let generation = loadDashboardGeneration
+
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
-            
+
             let (start, end) = self.dashboardDateRange()
             let events = self.calendarService.fetchEvents(from: start, to: end)
             let filtered = events.filter { event in
@@ -177,18 +214,35 @@ class CalendarViewModel: ObservableObject {
                 return true
             }
             let wrapped = filtered.map { CalendarEvent(ekEvent: $0) }
-            
+
             DispatchQueue.main.async {
+                guard self.loadDashboardGeneration == generation else { return }
                 self.dashboardEvents = wrapped
                 self.dashboardIsLoading = false
             }
         }
     }
-    
+
+    func loadMonthEvents(month: Date) {
+        guard isAuthorized else { return }
+        let cal = Calendar.current
+        guard let start = cal.date(from: cal.dateComponents([.year, .month], from: month)),
+              let end = cal.date(byAdding: DateComponents(month: 1, second: -1), to: start) else { return }
+
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self else { return }
+            let events = self.calendarService.fetchEvents(from: start, to: end)
+            let dates = Set(events.filter { !$0.isAllDay }.map { cal.startOfDay(for: $0.startDate) })
+            DispatchQueue.main.async {
+                self.monthEventStartDates = dates
+            }
+        }
+    }
+
     private func dashboardDateRange() -> (Date, Date) {
         let calendar = Calendar.current
         let now = Date()
-        
+
         switch dashboardRange {
         case .day:
             let start = calendar.startOfDay(for: now)
@@ -210,7 +264,7 @@ class CalendarViewModel: ObservableObject {
             return (start, end)
         }
     }
-    
+
     init() {
         self.authorizationStatus = calendarService.checkAuthorizationStatus()
         if let saved = UserDefaults.standard.string(forKey: "dashboardRange"),
@@ -218,13 +272,14 @@ class CalendarViewModel: ObservableObject {
             self.dashboardRange = range
         }
     }
-    
+
     func requestAccess() {
         calendarService.requestAccess { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let granted):
-                self.authorizationStatus = granted ? .authorized : .denied
+                // Re-read the real status rather than hardcoding .authorized (iOS 17+ returns .fullAccess)
+                self.authorizationStatus = self.calendarService.checkAuthorizationStatus()
                 if granted {
                     self.loadEvents()
                     self.loadDashboardEvents()
@@ -232,48 +287,45 @@ class CalendarViewModel: ObservableObject {
                     self.error = "Calendar access denied."
                 }
             case .failure(let err):
-                self.authorizationStatus = .denied
-                    self.error = "Authorization error: \(err.localizedDescription)"
+                self.authorizationStatus = self.calendarService.checkAuthorizationStatus()
+                self.error = "Authorization error: \(err.localizedDescription)"
             }
         }
     }
-    
+
     // MARK: - Write Operations
-    
+
     func conflictingEvents(start: Date, end: Date) -> [CalendarEvent] {
         let events = calendarService.fetchEvents(from: start, to: end)
         return events
             .filter { !$0.isAllDay }
             .filter { event in
-                // Check overlap: event starts before our end AND ends after our start
                 event.startDate < end && event.endDate > start
             }
             .map { CalendarEvent(ekEvent: $0) }
     }
-    
+
     func createVisit(clientName: String, date: Date, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, serviceNote: String?) -> Bool {
         let calendar = Calendar.current
-        
+
         guard let startDate = calendar.date(bySettingHour: startHour, minute: startMinute, second: 0, of: date),
               let endDate = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: date),
               endDate > startDate else {
             return false
         }
-        
-        // Check for conflicts
+
         let conflicts = conflictingEvents(start: startDate, end: endDate)
         if !conflicts.isEmpty {
             self.error = "Time conflict with: \(conflicts.map { "\($0.clientName) (\($0.startDate.formattedTime())–\($0.endDate.formattedTime()))" }.joined(separator: ", "))"
             return false
         }
-        
-        // Format title: "ClientName HH:MM serviceNote"
+
         let timeStr = String(format: "%d:%02d", startHour, startMinute)
         var title = "\(clientName) \(timeStr)"
         if let note = serviceNote, !note.trimmingCharacters(in: .whitespaces).isEmpty {
             title += " \(note)"
         }
-        
+
         do {
             _ = try calendarService.createEvent(title: title, startDate: startDate, endDate: endDate)
             loadEvents()
@@ -284,7 +336,7 @@ class CalendarViewModel: ObservableObject {
             return false
         }
     }
-    
+
     func deleteVisit(_ event: CalendarEvent) {
         do {
             try calendarService.deleteEvent(event.ekEvent)
@@ -294,100 +346,96 @@ class CalendarViewModel: ObservableObject {
             self.error = "Failed to delete visit: \(error.localizedDescription)"
         }
     }
-    
+
     func loadEvents() {
-        self.authorizationStatus = calendarService.checkAuthorizationStatus()
-        guard authorizationStatus == .authorized else {
-            return
-        }
-        
+        authorizationStatus = calendarService.checkAuthorizationStatus()
+        guard isAuthorized else { return }
+
         isLoading = true
         error = nil
-        
-        // Simulating pull to refresh delay slightly for premium feel or direct fetch
+        loadEventsGeneration += 1
+        let generation = loadEventsGeneration
+        let dateSnapshot = selectedDate
+
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
-            
-            let fetchedEvents = self.calendarService.fetchEvents(for: self.selectedDate)
-            
-            // Build the slots using the algorithm
-            let calculatedSlots = self.calculateSlots(events: fetchedEvents)
-            
+            let fetchedEvents = self.calendarService.fetchEvents(for: dateSnapshot)
+            let calculatedSlots = self.calculateSlots(events: fetchedEvents, for: dateSnapshot)
+
             DispatchQueue.main.async {
+                guard self.loadEventsGeneration == generation else { return }
                 self.slots = calculatedSlots
                 self.isLoading = false
             }
         }
     }
-    
-    private func calculateSlots(events: [EKEvent]) -> [TimeSlot] {
+
+    private func calculateSlots(events: [EKEvent], for date: Date) -> [TimeSlot] {
         let calendar = Calendar.current
-        
-        // Define workStart and workEnd Date bounds for the selectedDate
-        guard let workStart = calendar.date(bySettingHour: workStartHour, minute: workStartMinute, second: 0, of: selectedDate),
-              let workEnd = calendar.date(bySettingHour: workEndHour, minute: workEndMinute, second: 0, of: selectedDate),
+
+        guard let workStart = calendar.date(bySettingHour: workStartHour, minute: workStartMinute, second: 0, of: date),
+              let workEnd = calendar.date(bySettingHour: workEndHour, minute: workEndMinute, second: 0, of: date),
               workStart < workEnd else {
             return []
         }
-        
+
         // 1. Filter out all-day events and those outside work hours
         let filteredEvents = events.filter { event in
             if event.isAllDay { return false }
-            
             let title = event.title ?? ""
             if filterNoTitleEvents && title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 return false
             }
-            
-            // Event must start before workEnd AND end after workStart
             return event.startDate < workEnd && event.endDate > workStart
         }
-        
+
         // 2. Sort by start date
         let sortedEvents = filteredEvents.sorted { $0.startDate < $1.startDate }
-        
-        // 3. Clamp events and merge overlaps
+
+        // 3. Clamp events to work hours and merge overlaps, preserving all events in each merged slot
         var busySlots: [TimeSlot] = []
         for event in sortedEvents {
             let wrapped = CalendarEvent(ekEvent: event)
             let start = max(event.startDate, workStart)
             let end = min(event.endDate, workEnd)
-            
+
             if start < end {
-                if let last = busySlots.last {
-                    if start <= last.endDate {
-                        // Overlap found, merge them
-                        let mergedEnd = max(last.endDate, end)
-                        let mergedTitle = last.title == wrapped.clientName ? last.title : "\(last.title), \(wrapped.clientName)"
-                        busySlots.removeLast()
-                        busySlots.append(TimeSlot(startDate: last.startDate, endDate: mergedEnd, type: .busy, title: mergedTitle, associatedEvent: wrapped))
-                    } else {
-                        busySlots.append(TimeSlot(startDate: start, endDate: end, type: .busy, title: wrapped.clientName, associatedEvent: wrapped))
-                    }
+                if let last = busySlots.last, start <= last.endDate {
+                    // Overlap — merge into previous slot, keeping all associated events
+                    let mergedEnd = max(last.endDate, end)
+                    let mergedTitle = last.title == wrapped.clientName
+                        ? last.title
+                        : "\(last.title), \(wrapped.clientName)"
+                    busySlots.removeLast()
+                    busySlots.append(TimeSlot(
+                        startDate: last.startDate,
+                        endDate: mergedEnd,
+                        type: .busy,
+                        title: mergedTitle,
+                        associatedEvents: last.associatedEvents + [wrapped]
+                    ))
                 } else {
                     busySlots.append(TimeSlot(startDate: start, endDate: end, type: .busy, title: wrapped.clientName, associatedEvent: wrapped))
                 }
             }
         }
-        
-        // 4. Calculate free slots between busy slots
+
+        // 4. Fill gaps between busy slots with free slots
         var allSlots: [TimeSlot] = []
         var currentPointer = workStart
-        
+
         for busy in busySlots {
             if currentPointer < busy.startDate {
-                // There is a free slot before this busy slot
                 allSlots.append(TimeSlot(startDate: currentPointer, endDate: busy.startDate, type: .free, title: "Free"))
             }
             allSlots.append(busy)
             currentPointer = max(currentPointer, busy.endDate)
         }
-        
+
         if currentPointer < workEnd {
-            // There is a free slot at the end of the work day
-                allSlots.append(TimeSlot(startDate: currentPointer, endDate: workEnd, type: .free, title: "Free"))
+            allSlots.append(TimeSlot(startDate: currentPointer, endDate: workEnd, type: .free, title: "Free"))
         }
-        
+
         return allSlots
     }
 }

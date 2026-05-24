@@ -5,7 +5,7 @@ struct BusySlotCard: View {
     let onTap: () -> Void
     
     private var event: CalendarEvent? { slot.associatedEvent }
-    
+
     var body: some View {
         Button(action: onTap) {
             EventCard(accentColor: .busyColor) {
@@ -15,18 +15,19 @@ struct BusySlotCard: View {
                         Circle()
                             .fill(Color.busyColor.opacity(0.15))
                             .frame(width: 32, height: 32)
-                        
-                        Text(String((event?.clientName ?? "?").prefix(1).uppercased()))
+
+                        Text(String(slot.title.prefix(1).uppercased()))
                             .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundColor(.busyColor)
                     }
-                    
+
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(event?.clientName ?? slot.title)
+                        // slot.title already contains merged names ("A, B") for overlapping events
+                        Text(slot.title)
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.primaryText)
                             .lineLimit(1)
-                        
+
                         if let service = event?.serviceNote, !service.isEmpty {
                             Text(service)
                                 .font(.system(size: 12))
