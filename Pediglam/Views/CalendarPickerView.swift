@@ -7,7 +7,6 @@ struct CalendarPickerView: View {
     @State private var showCreateVisit = false
     @State private var calendarExpanded = true
     
-    @State private var rotationDegree: Double = 0.0
     @State private var displayedMonth = Date()
     
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 7)
@@ -28,28 +27,6 @@ struct CalendarPickerView: View {
                         .font(.title2)
                         .foregroundColor(.iosBlue)
                         .padding(.trailing, 6)
-                }
-                
-                Button(action: {
-                    withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: false)) {
-                        rotationDegree = 360.0
-                    }
-                    viewModel.loadEvents()
-                }) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.iosBlue)
-                        .padding(8)
-                        .background(Color.iosBlue.opacity(0.08))
-                        .clipShape(Circle())
-                        .rotationEffect(.degrees(rotationDegree))
-                }
-                .onChange(of: viewModel.isLoading) { loading in
-                    if !loading {
-                        withAnimation(.linear(duration: 0.3)) {
-                            rotationDegree = 0.0
-                        }
-                    }
                 }
             }
             .padding(.horizontal)
