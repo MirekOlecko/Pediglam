@@ -13,7 +13,7 @@ struct ContentView: View {
             
             VStack(spacing: 0) {
                 // Header component
-                HeaderView(viewModel: viewModel)
+                HeaderView()
                 
                 // Sub-header (Date picker & Work hours display)
                 HStack {
