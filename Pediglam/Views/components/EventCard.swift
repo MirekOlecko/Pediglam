@@ -4,8 +4,6 @@ struct EventCard<Content: View>: View {
     let content: Content
     let accentColor: Color
     
-    @State private var isTapped = false
-    
     init(accentColor: Color, @ViewBuilder content: () -> Content) {
         self.accentColor = accentColor
         self.content = content()
@@ -13,25 +11,18 @@ struct EventCard<Content: View>: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            // Accent bar on the left
-            Rectangle()
+            // Thin accent bar — 3px like iOS Calendar
+            RoundedRectangle(cornerRadius: 1.5)
                 .fill(accentColor)
-                .frame(width: 5)
-                .cornerRadius(2.5)
-                .padding(.vertical, 8)
-                .padding(.leading, 8)
+                .frame(width: 3)
+                .padding(.vertical, 6)
+                .padding(.leading, 12)
             
             content
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
         }
         .background(Color.cardBackground)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.03), radius: 6, x: 0, y: 3)
-        .scaleEffect(isTapped ? 0.98 : 1.0)
-        .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isTapped)
-        .onLongPressGesture(minimumDuration: 0.1, pressing: { pressing in
-            isTapped = pressing
-        }, perform: {})
+        .cornerRadius(10)
     }
 }

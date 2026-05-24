@@ -9,44 +9,47 @@ struct BusySlotCard: View {
     var body: some View {
         Button(action: onTap) {
             EventCard(accentColor: .busyColor) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 5) {
-                        // Time range row
-                        HStack(spacing: 6) {
-                            Image(systemName: "person.fill")
-                                .foregroundColor(.busyColor)
-                                .font(.system(size: 12))
-                            
-                            Text("\(slot.startDate.formattedTime()) – \(slot.endDate.formattedTime())")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(.secondaryText)
-                        }
+                HStack(spacing: 10) {
+                    // Colored dot with initial — like iOS Calendar
+                    ZStack {
+                        Circle()
+                            .fill(Color.busyColor.opacity(0.15))
+                            .frame(width: 32, height: 32)
                         
-                        // Client name (cleaned, without embedded time)
+                        Text(String((event?.clientName ?? "?").prefix(1).uppercased()))
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                            .foregroundColor(.busyColor)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(event?.clientName ?? slot.title)
-                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.primaryText)
-                            .lineLimit(2)
+                            .lineLimit(1)
                         
-                        // Optional service note (e.g. "rece manicure, nogi")
                         if let service = event?.serviceNote, !service.isEmpty {
                             Text(service)
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(.busyColor.opacity(0.8))
+                                .font(.system(size: 12))
+                                .foregroundColor(.secondaryText)
                                 .lineLimit(1)
                         }
-                        
-                        // Duration
-                        Text(slot.duration.formattedDuration())
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondaryText)
                     }
                     
                     Spacer()
                     
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(slot.startDate.formattedTime()) – \(slot.endDate.formattedTime())")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondaryText)
+                        
+                        Text(slot.duration.formattedDuration())
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondaryText.opacity(0.7))
+                    }
+                    
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.secondaryText.opacity(0.4))
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.secondaryText.opacity(0.3))
                 }
             }
         }
