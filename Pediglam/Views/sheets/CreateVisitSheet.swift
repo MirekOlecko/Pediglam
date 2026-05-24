@@ -6,20 +6,20 @@ struct CreateVisitSheet: View {
     
     @State private var clientName: String = ""
     @State private var selectedDate: Date
-    @State private var startHour: Int = 9
-    @State private var startMinute: Int = 0
-    @State private var endHour: Int = 10
-    @State private var endMinute: Int = 0
+    @State private var startTime: Date
+    @State private var endTime: Date
     @State private var serviceNote: String = ""
-    
-    private let hours = Array(6...22)
-    private let minutes = Array(stride(from: 0, through: 55, by: 5))
     
     init(viewModel: CalendarViewModel) {
         self.viewModel = viewModel
         _selectedDate = State(initialValue: viewModel.selectedDate)
-        _startHour = State(initialValue: viewModel.workStartHour)
-        _endHour = State(initialValue: viewModel.workStartHour + 1)
+        
+        let calendar = Calendar.current
+        let today = Date()
+        let start = calendar.date(bySettingHour: viewModel.workStartHour, minute: 0, second: 0, of: today) ?? today
+        let end = calendar.date(bySettingHour: viewModel.workStartHour + 1, minute: 0, second: 0, of: today) ?? today
+        _startTime = State(initialValue: start)
+        _endTime = State(initialValue: end)
     }
     
     var body: some View {
@@ -44,8 +44,11 @@ struct CreateVisitSheet: View {
                 
                 // Time
                 Section("Time") {
-                    timePickerRow(label: "Start", hour: $startHour, minute: $startMinute)
-                    timePickerRow(label: "End", hour: $endHour, minute: $endMinute)
+                    DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
+                        .tint(.iosBlue)
+                    
+                    DatePicker("End", selection: $endTime, displayedComponents: .hourAndMinute)
+                        .tint(.iosBlue)
                 }
                 
                 // Preview
@@ -66,7 +69,7 @@ struct CreateVisitSheet: View {
                         Spacer()
                         
                         VStack(alignment: .trailing, spacing: 4) {
-                            Text("\(startTimeString) – \(endTimeString)")
+                            Text("\(startTime.formattedTime()) – \(endTime.formattedTime())")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.primaryText)
                             
@@ -88,13 +91,17 @@ struct CreateVisitSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
+                        let cal = Calendar.current
+                        let startComp = cal.dateComponents([.hour, .minute], from: startTime)
+                        let endComp = cal.dateComponents([.hour, .minute], from: endTime)
+                        
                         viewModel.createVisit(
                             clientName: clientName.isEmpty ? "Client" : clientName,
                             date: selectedDate,
-                            startHour: startHour,
-                            startMinute: startMinute,
-                            endHour: endHour,
-                            endMinute: endMinute,
+                            startHour: startComp.hour ?? 9,
+                            startMinute: startComp.minute ?? 0,
+                            endHour: endComp.hour ?? 10,
+                            endMinute: endComp.minute ?? 0,
                             serviceNote: serviceNote.isEmpty ? nil : serviceNote
                         )
                         dismiss()
@@ -106,55 +113,11 @@ struct CreateVisitSheet: View {
         }
     }
     
-    // MARK: - Time Picker Row
-    private func timePickerRow(label: String, hour: Binding<Int>, minute: Binding<Int>) -> some View {
-        HStack(spacing: 0) {
-            Text(label)
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(.secondaryText)
-                .frame(width: 50, alignment: .leading)
-            
-            Spacer()
-            
-            Picker("Hour", selection: hour) {
-                ForEach(hours, id: \.self) { h in
-                    Text(String(format: "%02d", h))
-                        .font(.system(size: 17, weight: .medium, design: .rounded))
-                        .tag(h)
-                }
-            }
-            .pickerStyle(.wheel)
-            .frame(width: 80, height: 110)
-            
-            Text(":")
-                .font(.system(size: 20, weight: .medium))
-                .foregroundColor(.primaryText)
-                .frame(width: 16)
-            
-            Picker("Minute", selection: minute) {
-                ForEach(minutes, id: \.self) { m in
-                    Text(String(format: "%02d", m))
-                        .font(.system(size: 17, weight: .medium, design: .rounded))
-                        .tag(m)
-                }
-            }
-            .pickerStyle(.wheel)
-            .frame(width: 80, height: 110)
-        }
-        .padding(.vertical, 4)
-    }
-    
-    private var startTimeString: String {
-        String(format: "%d:%02d", startHour, startMinute)
-    }
-    
-    private var endTimeString: String {
-        String(format: "%d:%02d", endHour, endMinute)
-    }
-    
     private var durationString: String {
-        let startMinutes = startHour * 60 + startMinute
-        let endMinutes = endHour * 60 + endMinute
+        let startComp = Calendar.current.dateComponents([.hour, .minute], from: startTime)
+        let endComp = Calendar.current.dateComponents([.hour, .minute], from: endTime)
+        let startMinutes = (startComp.hour ?? 0) * 60 + (startComp.minute ?? 0)
+        let endMinutes = (endComp.hour ?? 0) * 60 + (endComp.minute ?? 0)
         let diff = max(0, endMinutes - startMinutes)
         
         if diff < 60 {
