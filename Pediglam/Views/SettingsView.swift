@@ -39,6 +39,7 @@ struct SettingsView: View {
                             }
                             .padding(.vertical, 4)
                         }
+                        .listRowBackground(Color.cardBackground)
                     }
                 } header: {
                     Text("THEME")
@@ -49,10 +50,12 @@ struct SettingsView: View {
                     DatePicker("Start time", selection: $startPickerDate, displayedComponents: .hourAndMinute)
                         .tint(.iosBlue)
                         .onChange(of: startPickerDate) { _ in saveWorkHours() }
+                        .listRowBackground(Color.cardBackground)
                     
                     DatePicker("End time", selection: $endPickerDate, displayedComponents: .hourAndMinute)
                         .tint(.iosBlue)
                         .onChange(of: endPickerDate) { _ in saveWorkHours() }
+                        .listRowBackground(Color.cardBackground)
                 } header: {
                     Text("WORKING HOURS")
                 }
@@ -64,10 +67,12 @@ struct SettingsView: View {
                         .onChange(of: filterNoTitle) { newValue in
                             viewModel.filterNoTitleEvents = newValue
                         }
+                        .listRowBackground(Color.cardBackground)
                     
                     Text("Hide calendar events that don't have a title/client entered.")
                         .font(.caption)
                         .foregroundColor(.secondaryText)
+                        .listRowBackground(Color.cardBackground)
                 } header: {
                     Text("FILTERS")
                 }
@@ -80,6 +85,7 @@ struct SettingsView: View {
                         Text("Pediglam")
                             .foregroundColor(.secondaryText)
                     }
+                    .listRowBackground(Color.cardBackground)
                     
                     HStack {
                         Text("Version")
@@ -87,6 +93,7 @@ struct SettingsView: View {
                         Text("1.0.0")
                             .foregroundColor(.secondaryText)
                     }
+                    .listRowBackground(Color.cardBackground)
                     
                     HStack {
                         Text("Copyright")
@@ -94,6 +101,7 @@ struct SettingsView: View {
                         Text("© 2026 Pediglam")
                             .foregroundColor(.secondaryText)
                     }
+                    .listRowBackground(Color.cardBackground)
                 } header: {
                     Text("ABOUT")
                 }
