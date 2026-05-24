@@ -263,7 +263,7 @@ class CalendarViewModel: ObservableObject {
         // Check for conflicts
         let conflicts = conflictingEvents(start: startDate, end: endDate)
         if !conflicts.isEmpty {
-            self.error = "Time conflict with: \(conflicts.map { $0.clientName }.joined(separator: ", "))"
+            self.error = "Time conflict with: \(conflicts.map { "\($0.clientName) (\($0.startDate.formattedTime())–\($0.endDate.formattedTime()))" }.joined(separator: ", "))"
             return false
         }
         
