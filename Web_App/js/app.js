@@ -590,6 +590,23 @@ function renderSettings() {
         </div>
         
         <div class="settings-section">
+            <div class="settings-section-header">CALENDAR SYNC</div>
+            <div class="settings-row" onclick="exportICS()" style="cursor:pointer">
+                <span>📤</span>
+                <label>Export all visits (.ics)</label>
+                <span style="color:var(--blue)">↓</span>
+            </div>
+            <div class="settings-row" onclick="triggerImport()" style="cursor:pointer">
+                <span>📥</span>
+                <label>Import from Calendar (.ics)</label>
+                <span style="color:var(--blue)">↑</span>
+            </div>
+            <div style="padding:8px 16px 12px;font-size:11px;color:var(--text-secondary);line-height:1.4">
+                Export visits as .ics file to open in iOS Calendar. Import .ics files exported from your Calendar app to sync visits here.
+            </div>
+        </div>
+        
+        <div class="settings-section">
             <div class="settings-section-header">ABOUT</div>
             <div class="settings-row"><label>Name</label><span class="text-secondary">Pediglam</span></div>
             <div class="settings-row"><label>Version</label><span class="text-secondary">1.0.0</span></div>
@@ -714,6 +731,114 @@ function esc(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+
+// === ICS Calendar Integration ===
+function generateICS(visits) {
+    let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Pediglam//Web//EN\r\n';
+    visits.forEach(v => {
+        const s = new Date(v.startDate), e = new Date(v.endDate);
+        const fmt = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+        ics += 'BEGIN:VEVENT\r\n';
+        ics += `DTSTART:${fmt(s)}\r\n`;
+        ics += `DTEND:${fmt(e)}\r\n`;
+        ics += `SUMMARY:${v.clientName}` + (v.serviceNote ? ` - ${v.serviceNote}` : '') + '\r\n';
+        ics += `UID:pediglam-${v.id}@pediglam.app\r\n`;
+        ics += 'END:VEVENT\r\n';
+    });
+    ics += 'END:VCALENDAR\r\n';
+    return ics;
+}
+
+function exportICS() {
+    const ics = generateICS(App.visits);
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'pediglam_visits.ics';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function exportVisitICS(id) {
+    const v = getVisitById(id);
+    if (!v) return;
+    const ics = generateICS([v]);
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `pediglam_${v.clientName.replace(/\s+/g,'_')}.ics`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function importICS(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const events = [];
+        const lines = text.split(/\r?\n/);
+        let inEvent = false, event = {};
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line === 'BEGIN:VEVENT') { inEvent = true; event = {}; continue; }
+            if (line === 'END:VEVENT') { inEvent = false; events.push(event); continue; }
+            if (!inEvent) continue;
+            
+            // Handle folded lines (RFC 5545)
+            let fullLine = line;
+            while (i + 1 < lines.length && lines[i+1].startsWith(' ')) {
+                i++;
+                fullLine += lines[i].trim();
+            }
+            
+            const match = fullLine.match(/^(DTSTART|DTEND|SUMMARY|UID)[;:](.+)$/i);
+            if (match) {
+                const key = match[1].toLowerCase();
+                let val = match[2];
+                
+                if (key === 'dtstart' || key === 'dtend') {
+                    // Parse ICS date format: 20260524T090000 or 20260524T090000Z
+                    val = val.split(':').pop(); // Remove any TZID prefix
+                    const year = parseInt(val.substring(0,4));
+                    const month = parseInt(val.substring(4,6))-1;
+                    const day = parseInt(val.substring(6,8));
+                    const hour = val.length >= 13 ? parseInt(val.substring(9,11)) : 0;
+                    const min = val.length >= 13 ? parseInt(val.substring(11,13)) : 0;
+                    event[key] = new Date(year, month, day, hour, min, 0);
+                } else if (key === 'summary') {
+                    event.summary = val.replace(/\\,/g, ',').replace(/\\;/g, ';').replace(/\\n/g, '\n');
+                }
+            }
+        }
+        
+        let imported = 0;
+        events.forEach(ev => {
+            if (ev.dtstart && ev.dtend && ev.summary) {
+                // Parse: "ClientName - Service" or "ClientName"
+                let name = ev.summary, service = '';
+                const sepIdx = name.indexOf(' - ');
+                if (sepIdx > 0) { service = name.substring(sepIdx + 3); name = name.substring(0, sepIdx); }
+                
+                // Check conflicts
+                const conflicts = conflictingEvents(ev.dtstart, ev.dtend);
+                if (conflicts.length === 0) {
+                    addVisit(name, service, ev.dtstart, ev.dtend);
+                    imported++;
+                }
+            }
+        });
+        
+        showToast(`Imported ${imported} visits${imported < events.length ? ` (${events.length - imported} skipped due to conflicts)` : ''}`);
+        render();
+    };
+    reader.readAsText(file);
+}
+
+function triggerImport() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.ics,text/calendar';
+    input.onchange = function() { if (this.files[0]) importICS(this.files[0]); };
+    input.click();
 }
 
 // === Boot ===
