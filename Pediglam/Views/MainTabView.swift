@@ -48,7 +48,7 @@ struct MainTabView: View {
     // MARK: - Permission Request Gate
     private var permissionGate: some View {
         ZStack {
-            Color(UIColor.systemBackground).ignoresSafeArea()
+            Color.systemBackground.ignoresSafeArea()
             
             VStack(spacing: 24) {
                 Spacer()
@@ -95,7 +95,7 @@ struct MainTabView: View {
     // MARK: - Permission Denied Gate
     private var permissionDeniedGate: some View {
         ZStack {
-            Color(UIColor.systemBackground).ignoresSafeArea()
+            Color.systemBackground.ignoresSafeArea()
             
             VStack(spacing: 24) {
                 Spacer()
