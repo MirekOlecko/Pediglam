@@ -34,7 +34,7 @@ struct ContentView: View {
                     // Add visit button
                     Button(action: { showCreateVisit = true }) {
                         Image(systemName: "plus.circle.fill")
-                            .font(.title2)
+                            .font(.system(size: 28))
                             .foregroundColor(.iosBlue)
                     }
                     

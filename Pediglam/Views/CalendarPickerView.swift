@@ -24,7 +24,7 @@ struct CalendarPickerView: View {
                 
                 Button(action: { showCreateVisit = true }) {
                     Image(systemName: "plus.circle.fill")
-                        .font(.title2)
+                        .font(.system(size: 28))
                         .foregroundColor(.iosBlue)
                         .padding(.trailing, 6)
                 }
