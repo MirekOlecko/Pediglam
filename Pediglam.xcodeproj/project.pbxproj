@@ -53,7 +53,7 @@
 		987F8CF3C950702BF39AC787 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		B0E8E3B6116356CC7D5DD3AB /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		BC77BC1F2331E5144A1E0AF4 /* SettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSheet.swift; sourceTree = "<group>"; };
-		BD5D3C9544A7B37ECA1CE586 /* Pediglam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pediglam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD5D3C9544A7B37ECA1CE586 /* Pediglam.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Pediglam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDC116E2127B8EB5789AF191 /* TimeSlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSlot.swift; sourceTree = "<group>"; };
 		C03ED1336D58FCF353667092 /* DaySchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaySchedule.swift; sourceTree = "<group>"; };
 		CADCF1CBFB1BA2140470A543 /* EventDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailSheet.swift; sourceTree = "<group>"; };
@@ -215,6 +215,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 55A4818F9F1D8AF6D5D8E654 /* Build configuration list for PBXProject "Pediglam" */;
 			developmentRegion = en;
@@ -288,7 +290,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Pediglam/Resources/Assets.xcassets\"";
-				DEVELOPMENT_TEAM = SY7AZD8JTH;
 				INFOPLIST_FILE = Pediglam/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -364,7 +365,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Pediglam/Resources/Assets.xcassets\"";
-				DEVELOPMENT_TEAM = SY7AZD8JTH;
 				INFOPLIST_FILE = Pediglam/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
