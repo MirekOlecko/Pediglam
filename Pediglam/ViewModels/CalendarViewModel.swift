@@ -320,16 +320,13 @@ class CalendarViewModel: ObservableObject {
             return false
         }
 
-        let timeStr = String(format: "%d:%02d", startHour, startMinute)
-        var title = "\(clientName) \(timeStr)"
-        if let note = serviceNote, !note.trimmingCharacters(in: .whitespaces).isEmpty {
-            title += " \(note)"
-        }
+        let title = visitTitle(clientName: clientName, startHour: startHour, startMinute: startMinute, serviceNote: serviceNote)
 
         do {
             _ = try calendarService.createEvent(title: title, startDate: startDate, endDate: endDate)
             loadEvents()
             loadDashboardEvents()
+            loadMonthEvents(month: date)
             return true
         } catch {
             self.error = "Failed to create visit: \(error.localizedDescription)"
@@ -337,14 +334,59 @@ class CalendarViewModel: ObservableObject {
         }
     }
 
-    func deleteVisit(_ event: CalendarEvent) {
+    func updateVisit(_ event: CalendarEvent, clientName: String, date: Date, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, serviceNote: String?) -> Bool {
+        let calendar = Calendar.current
+
+        guard let startDate = calendar.date(bySettingHour: startHour, minute: startMinute, second: 0, of: date),
+              let endDate = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: date),
+              endDate > startDate else {
+            return false
+        }
+
+        let originalEventIdentifier = event.ekEvent.eventIdentifier
+        let conflicts = conflictingEvents(start: startDate, end: endDate)
+            .filter { $0.ekEvent.eventIdentifier != originalEventIdentifier }
+
+        if !conflicts.isEmpty {
+            self.error = "Time conflict with: \(conflicts.map { "\($0.clientName) (\($0.startDate.formattedTime())–\($0.endDate.formattedTime()))" }.joined(separator: ", "))"
+            return false
+        }
+
+        let title = visitTitle(clientName: clientName, startHour: startHour, startMinute: startMinute, serviceNote: serviceNote)
+
+        do {
+            _ = try calendarService.updateEvent(event.ekEvent, title: title, startDate: startDate, endDate: endDate)
+            loadEvents()
+            loadDashboardEvents()
+            loadMonthEvents(month: event.startDate)
+            loadMonthEvents(month: date)
+            return true
+        } catch {
+            self.error = "Failed to update visit: \(error.localizedDescription)"
+            return false
+        }
+    }
+
+    func deleteVisit(_ event: CalendarEvent) -> Bool {
         do {
             try calendarService.deleteEvent(event.ekEvent)
             loadEvents()
             loadDashboardEvents()
+            loadMonthEvents(month: event.startDate)
+            return true
         } catch {
             self.error = "Failed to delete visit: \(error.localizedDescription)"
+            return false
         }
+    }
+
+    private func visitTitle(clientName: String, startHour: Int, startMinute: Int, serviceNote: String?) -> String {
+        let timeStr = String(format: "%d:%02d", startHour, startMinute)
+        var title = "\(clientName.trimmingCharacters(in: .whitespacesAndNewlines)) \(timeStr)"
+        if let note = serviceNote?.trimmingCharacters(in: .whitespacesAndNewlines), !note.isEmpty {
+            title += " \(note)"
+        }
+        return title
     }
 
     func loadEvents() {

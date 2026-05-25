@@ -59,6 +59,14 @@ class CalendarService {
         try eventStore.save(event, span: .thisEvent)
         return event
     }
+
+    func updateEvent(_ event: EKEvent, title: String, startDate: Date, endDate: Date) throws -> EKEvent {
+        event.title = title
+        event.startDate = startDate
+        event.endDate = endDate
+        try eventStore.save(event, span: .thisEvent)
+        return event
+    }
     
     func deleteEvent(_ event: EKEvent) throws {
         try eventStore.remove(event, span: .thisEvent)

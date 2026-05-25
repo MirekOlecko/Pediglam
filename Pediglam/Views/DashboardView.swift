@@ -53,7 +53,7 @@ struct DashboardView: View {
             }
         }
         .sheet(item: $selectedEventDetail) { event in
-            EventDetailSheet(event: event)
+            EventDetailSheet(event: event, viewModel: viewModel)
         }
     }
 

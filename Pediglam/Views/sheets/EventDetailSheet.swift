@@ -2,7 +2,12 @@ import SwiftUI
 
 struct EventDetailSheet: View {
     let event: CalendarEvent
+    @ObservedObject var viewModel: CalendarViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var showEditSheet = false
+    @State private var showDeleteConfirmation = false
+    @State private var showDeleteError = false
+    @State private var deleteErrorMessage = ""
     
     var body: some View {
         NavigationStack {
@@ -18,6 +23,7 @@ struct EventDetailSheet: View {
                             notesCard(notes)
                         }
 
+                        actionButtons
                         openCalendarButton
                     }
                     .padding(.horizontal, AppStyle.horizontalPadding)
@@ -35,6 +41,24 @@ struct EventDetailSheet: View {
                     }
                     .foregroundColor(.secondaryText)
                     .fontWeight(.medium)
+                }
+            }
+            .confirmationDialog("Delete visit?", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
+                Button("Delete Visit", role: .destructive) {
+                    deleteVisit()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This removes the appointment from your calendar and from Pediglam.")
+            }
+            .alert("Could not delete visit", isPresented: $showDeleteError) {
+                Button("OK") { }
+            } message: {
+                Text(deleteErrorMessage)
+            }
+            .sheet(isPresented: $showEditSheet) {
+                CreateVisitSheet(viewModel: viewModel, event: event) {
+                    dismiss()
                 }
             }
         }
@@ -116,6 +140,47 @@ struct EventDetailSheet: View {
         }
     }
 
+    private var actionButtons: some View {
+        HStack(spacing: 12) {
+            Button {
+                showEditSheet = true
+            } label: {
+                actionButtonLabel(title: "Edit", icon: "pencil", foreground: .white)
+                    .frame(maxWidth: .infinity)
+                    .background(AppStyle.accentGradient)
+                    .clipShape(.rect(cornerRadius: AppStyle.controlRadius, style: .continuous))
+                    .shadow(color: Color.iosBlue.opacity(0.22), radius: 10, x: 0, y: 6)
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                showDeleteConfirmation = true
+            } label: {
+                actionButtonLabel(title: "Delete", icon: "trash", foreground: .busyColor)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.busyColor.opacity(0.10))
+                    .clipShape(.rect(cornerRadius: AppStyle.controlRadius, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppStyle.controlRadius, style: .continuous)
+                            .stroke(Color.busyColor.opacity(0.18), lineWidth: 1)
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func actionButtonLabel(title: String, icon: String, foreground: Color) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .bold))
+
+            Text(title)
+                .font(.system(size: 15, weight: .bold, design: .rounded))
+        }
+        .foregroundColor(foreground)
+        .padding(.vertical, 14)
+    }
+
     private var openCalendarButton: some View {
         Button {
             let interval = event.startDate.timeIntervalSinceReferenceDate
@@ -159,5 +224,14 @@ struct EventDetailSheet: View {
             Spacer()
         }
         .padding(14)
+    }
+
+    private func deleteVisit() {
+        if viewModel.deleteVisit(event) {
+            dismiss()
+        } else {
+            deleteErrorMessage = viewModel.error ?? "The calendar event could not be removed."
+            showDeleteError = true
+        }
     }
 }

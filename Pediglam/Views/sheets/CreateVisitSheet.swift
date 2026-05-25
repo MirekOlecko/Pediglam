@@ -3,6 +3,9 @@ import SwiftUI
 struct CreateVisitSheet: View {
     @ObservedObject var viewModel: CalendarViewModel
     @Environment(\.dismiss) private var dismiss
+
+    private let editingEvent: CalendarEvent?
+    private let onSaved: (() -> Void)?
     
     @State private var clientName: String = ""
     @State private var selectedDate: Date
@@ -11,9 +14,17 @@ struct CreateVisitSheet: View {
     @State private var serviceNote: String = ""
     @State private var showConflictAlert = false
     @State private var conflictMessage = ""
+    @FocusState private var focusedField: FocusedField?
+
+    private enum FocusedField: Hashable {
+        case clientName
+        case serviceNote
+    }
     
-    init(viewModel: CalendarViewModel) {
+    init(viewModel: CalendarViewModel, onSaved: (() -> Void)? = nil) {
         self.viewModel = viewModel
+        self.editingEvent = nil
+        self.onSaved = onSaved
         _selectedDate = State(initialValue: viewModel.selectedDate)
         
         let calendar = Calendar.current
@@ -23,6 +34,17 @@ struct CreateVisitSheet: View {
         _startTime = State(initialValue: start)
         _endTime = State(initialValue: end)
     }
+
+    init(viewModel: CalendarViewModel, event: CalendarEvent, onSaved: (() -> Void)? = nil) {
+        self.viewModel = viewModel
+        self.editingEvent = event
+        self.onSaved = onSaved
+        _clientName = State(initialValue: event.clientName == "Busy" ? "" : event.clientName)
+        _selectedDate = State(initialValue: event.startDate)
+        _startTime = State(initialValue: event.startDate)
+        _endTime = State(initialValue: event.endDate)
+        _serviceNote = State(initialValue: event.serviceNote ?? "")
+    }
     
     var body: some View {
         NavigationStack {
@@ -31,20 +53,19 @@ struct CreateVisitSheet: View {
 
                 ScrollView {
                     VStack(spacing: 16) {
-                        sheetIntro
                         clientSection
                         dateSection
                         timeSection
                         previewSection
-                        saveButton
                     }
                     .padding(.horizontal, AppStyle.horizontalPadding)
                     .padding(.top, 14)
                     .padding(.bottom, 28)
                 }
+                .scrollDismissesKeyboard(.interactively)
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("New Visit")
+            .navigationTitle(isEditing ? "Edit Visit" : "New Visit")
             .navigationBarTitleDisplayMode(.inline)
             .alert("Time Conflict", isPresented: $showConflictAlert) {
                 Button("OK") { }
@@ -56,37 +77,33 @@ struct CreateVisitSheet: View {
                     Button("Cancel") { dismiss() }
                         .foregroundColor(.secondaryText)
                 }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(isEditing ? "Save" : "Save Visit") {
+                        saveVisit()
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundColor(.iosBlue)
+                    .disabled(!canSave)
+                }
+
+                ToolbarItemGroup(placement: .keyboard) {
+                    if focusedField == .clientName {
+                        Button("Next") {
+                            focusedField = .serviceNote
+                        }
+                        .fontWeight(.semibold)
+                    }
+
+                    Spacer()
+
+                    Button("Done") {
+                        dismissKeyboard()
+                    }
+                    .fontWeight(.semibold)
+                }
             }
         }
-    }
-
-    private var sheetIntro: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(AppStyle.busyGradient)
-                    .frame(width: 52, height: 52)
-                    .shadow(color: Color.busyColor.opacity(0.22), radius: 12, x: 0, y: 7)
-
-                Image(systemName: "calendar.badge.plus")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Book a visit")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(.primaryText)
-
-                Text("Create a clean calendar appointment")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundColor(.secondaryText)
-            }
-
-            Spacer()
-        }
-        .padding(18)
-        .premiumCard(cornerRadius: 24, shadowRadius: 16)
     }
 
     private var clientSection: some View {
@@ -98,7 +115,12 @@ struct CreateVisitSheet: View {
                     TextField("Client name", text: $clientName)
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundColor(.primaryText)
+                        .focused($focusedField, equals: .clientName)
+                        .submitLabel(.next)
                         .textInputAutocapitalization(.words)
+                        .onSubmit {
+                            focusedField = .serviceNote
+                        }
                 }
                 .padding(14)
 
@@ -110,6 +132,11 @@ struct CreateVisitSheet: View {
                     TextField("Service note (optional)", text: $serviceNote)
                         .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundColor(.primaryText)
+                        .focused($focusedField, equals: .serviceNote)
+                        .submitLabel(.done)
+                        .onSubmit {
+                            dismissKeyboard()
+                        }
                 }
                 .padding(14)
             }
@@ -118,7 +145,7 @@ struct CreateVisitSheet: View {
 
     private var dateSection: some View {
         PremiumSettingsSection(title: "Date") {
-            DatePicker("Date", selection: $selectedDate, displayedComponents: [.date])
+            DatePicker("Date", selection: selectedDateBinding, displayedComponents: [.date])
                 .datePickerStyle(.graphical)
                 .labelsHidden()
                 .tint(.iosBlue)
@@ -133,7 +160,7 @@ struct CreateVisitSheet: View {
                 HStack(spacing: 12) {
                     SettingsRowIcon(systemName: "clock.fill", color: .freeColor)
 
-                    DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
+                    DatePicker("Start", selection: startTimeBinding, displayedComponents: .hourAndMinute)
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundColor(.primaryText)
                         .tint(.iosBlue)
@@ -145,7 +172,7 @@ struct CreateVisitSheet: View {
                 HStack(spacing: 12) {
                     SettingsRowIcon(systemName: "timer", color: .busyColor)
 
-                    DatePicker("End", selection: $endTime, displayedComponents: .hourAndMinute)
+                    DatePicker("End", selection: endTimeBinding, displayedComponents: .hourAndMinute)
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundColor(.primaryText)
                         .tint(.iosBlue)
@@ -193,31 +220,42 @@ struct CreateVisitSheet: View {
         }
     }
 
-    private var saveButton: some View {
-        Button {
-            saveVisit()
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .bold))
-
-                Text("Save visit")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-            }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 15)
-            .background(canSave ? AnyShapeStyle(AppStyle.accentGradient) : AnyShapeStyle(Color.secondaryText.opacity(0.24)))
-            .clipShape(.rect(cornerRadius: AppStyle.controlRadius, style: .continuous))
-            .shadow(color: canSave ? Color.iosBlue.opacity(0.25) : .clear, radius: 12, x: 0, y: 7)
-        }
-        .buttonStyle(.plain)
-        .disabled(!canSave)
-        .padding(.top, 4)
-    }
-
     private var canSave: Bool {
         !clientName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var isEditing: Bool {
+        editingEvent != nil
+    }
+
+    private var selectedDateBinding: Binding<Date> {
+        Binding(
+            get: { selectedDate },
+            set: { newValue in
+                dismissKeyboard()
+                selectedDate = newValue
+            }
+        )
+    }
+
+    private var startTimeBinding: Binding<Date> {
+        Binding(
+            get: { startTime },
+            set: { newValue in
+                dismissKeyboard()
+                startTime = newValue
+            }
+        )
+    }
+
+    private var endTimeBinding: Binding<Date> {
+        Binding(
+            get: { endTime },
+            set: { newValue in
+                dismissKeyboard()
+                endTime = newValue
+            }
+        )
     }
     
     private var durationString: String {
@@ -243,21 +281,44 @@ struct CreateVisitSheet: View {
         let startComp = cal.dateComponents([.hour, .minute], from: startTime)
         let endComp = cal.dateComponents([.hour, .minute], from: endTime)
 
-        let success = viewModel.createVisit(
-            clientName: clientName.trimmingCharacters(in: .whitespacesAndNewlines),
-            date: selectedDate,
-            startHour: startComp.hour ?? 9,
-            startMinute: startComp.minute ?? 0,
-            endHour: endComp.hour ?? 10,
-            endMinute: endComp.minute ?? 0,
-            serviceNote: serviceNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : serviceNote.trimmingCharacters(in: .whitespacesAndNewlines)
-        )
+        let trimmedClientName = clientName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedServiceNote = serviceNote.trimmingCharacters(in: .whitespacesAndNewlines)
+        let serviceNoteValue = trimmedServiceNote.isEmpty ? nil : trimmedServiceNote
+
+        let success: Bool
+        if let editingEvent {
+            success = viewModel.updateVisit(
+                editingEvent,
+                clientName: trimmedClientName,
+                date: selectedDate,
+                startHour: startComp.hour ?? 9,
+                startMinute: startComp.minute ?? 0,
+                endHour: endComp.hour ?? 10,
+                endMinute: endComp.minute ?? 0,
+                serviceNote: serviceNoteValue
+            )
+        } else {
+            success = viewModel.createVisit(
+                clientName: trimmedClientName,
+                date: selectedDate,
+                startHour: startComp.hour ?? 9,
+                startMinute: startComp.minute ?? 0,
+                endHour: endComp.hour ?? 10,
+                endMinute: endComp.minute ?? 0,
+                serviceNote: serviceNoteValue
+            )
+        }
 
         if success {
+            onSaved?()
             dismiss()
         } else if let error = viewModel.error {
             conflictMessage = error
             showConflictAlert = true
         }
+    }
+
+    private func dismissKeyboard() {
+        focusedField = nil
     }
 }

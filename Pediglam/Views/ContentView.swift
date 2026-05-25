@@ -13,7 +13,7 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomTrailing) {
             PremiumBackground()
 
             VStack(spacing: 0) {
@@ -22,20 +22,14 @@ struct ContentView: View {
                     subtitle: viewModel.selectedDate.formattedPolishHeader(),
                     systemImage: "clock.fill"
                 ) {
-                    HStack(spacing: 10) {
-                        PremiumIconButton(systemName: "plus") {
-                            showCreateVisit = true
-                        }
-
-                        DatePicker(
-                            "",
-                            selection: $viewModel.selectedDate,
-                            displayedComponents: [.date]
-                        )
-                        .labelsHidden()
-                        .datePickerStyle(.compact)
-                        .tint(.iosBlue)
-                    }
+                    DatePicker(
+                        "",
+                        selection: $viewModel.selectedDate,
+                        displayedComponents: [.date]
+                    )
+                    .labelsHidden()
+                    .datePickerStyle(.compact)
+                    .tint(.iosBlue)
                 }
 
                 if viewModel.isLoading && viewModel.slots.isEmpty {
@@ -85,9 +79,11 @@ struct ContentView: View {
             }
             .frame(maxWidth: 640)
             .frame(maxWidth: .infinity, alignment: .center)
+
+            floatingCreateVisitButton
         }
         .sheet(item: $selectedEventDetail) { event in
-            EventDetailSheet(event: event)
+            EventDetailSheet(event: event, viewModel: viewModel)
         }
         .sheet(isPresented: $showCreateVisit) {
             CreateVisitSheet(viewModel: viewModel)
@@ -95,6 +91,24 @@ struct ContentView: View {
         .onAppear {
             viewModel.loadEvents()
         }
+    }
+
+    private var floatingCreateVisitButton: some View {
+        Button {
+            showCreateVisit = true
+        } label: {
+            Image(systemName: "plus")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundColor(.white)
+                .frame(width: 60, height: 60)
+                .background(AppStyle.accentGradient)
+                .clipShape(Circle())
+                .shadow(color: Color.iosBlue.opacity(0.32), radius: 16, x: 0, y: 10)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Create new visit")
+        .padding(.trailing, AppStyle.horizontalPadding)
+        .padding(.bottom, 24)
     }
 }
 

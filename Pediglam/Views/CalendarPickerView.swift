@@ -46,7 +46,7 @@ struct CalendarPickerView: View {
             .frame(maxWidth: .infinity)
         }
         .sheet(item: $selectedEventDetail) { event in
-            EventDetailSheet(event: event)
+            EventDetailSheet(event: event, viewModel: viewModel)
         }
         .sheet(isPresented: $showCreateVisit) {
             CreateVisitSheet(viewModel: viewModel)
